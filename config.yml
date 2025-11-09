@@ -1,0 +1,57 @@
+# --- Configuración global ---
+symbol: "EUR.USD"
+timezone: "UTC"            # TODO: los datos se normalizan a UTC
+timeframe: "M5"            # M1|M5|M15|H1
+warmup_bars: 200           # barras para calcular indicadores sin señales
+
+# --- Ventanas indicadores ---
+indicators:
+  ema_fast: 12             # típica MACD
+  ema_slow: 26
+  rsi_period: 14
+  macd_signal: 9
+  atr_period: 14
+  bb_period: 20
+  bb_k: 2.0
+
+# --- Estrategia y filtros ---
+strategy:
+  rsi_long_min: 55         # RSI debe estar por encima (no sobreventa)
+  rsi_short_max: 45        # RSI por debajo (no sobrecompra)
+  macd_confirm: true
+  min_atr_pct: 0.0003      # ATR/Close mínimo (ej. 3 pips por mil)
+  regime_threshold: 0.0001 # |EMAf-EMAs|/Close para "tendencia"
+
+# --- Riesgo y ejecución ---
+risk:
+  capital: 10000.0
+  risk_per_trade: 0.0075   # 0.75%
+  atr_sl_mult: 1.5         # SL = 1.5 * ATR
+  atr_tp_mult: 2.0         # TP = 2.0 * ATR
+  trailing_mult: 0.0       # 0 desactiva trailing
+  daily_loss_limit: 0.03   # 3% del capital
+  max_trades_per_day: 6
+  max_position_units: 100000  # cap unidades
+  min_position_units: 1000
+
+execution:
+  simulate_spread: 0.00005     # ~0.5 pips
+  simulate_slippage: 0.00002   # ~0.2 pips
+
+# --- Datos ---
+data:
+  source: "simulated"      # "simulated" | "ib" | "csv"
+  csv_path: "./data/eurusd.csv"   # si source=csv
+  bars: 3000
+  seed: 42
+
+# --- API ---
+api:
+  host: "127.0.0.1"
+  port: 8000
+  cors_origins: ["*"]
+
+# --- Flags ---
+flags:
+  enable_live: false       # ignorado si PAPER=true
+  paper_only: true
