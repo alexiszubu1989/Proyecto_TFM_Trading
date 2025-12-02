@@ -26,6 +26,8 @@ class BTResult:
     metrics: dict
 
 def compute_metrics(equity: pd.Series) -> dict:
+    if len(equity) == 0:
+        return {"CAGR": 0.0, "Sharpe": 0.0, "Sortino": 0.0, "MaxDrawdown": 0.0, "Bars": 0}
     ret = equity.pct_change().fillna(0.0)
     ann = 252
     cagr = (equity.iloc[-1] / equity.iloc[0]) - 1.0
@@ -77,8 +79,9 @@ def run_backtest() -> BTResult:
     eq = pd.Series({t:v for t,v in equity_curve})
     trades = pd.DataFrame(records)
     metrics = compute_metrics(eq)
+    last_eq = float(eq.iloc[-1]) if len(eq) > 0 else rk["capital"]
     with open("backtest_report.json","w",encoding="utf-8") as f:
-        json.dump({"metrics":metrics,"last_equity":float(eq.iloc[-1])}, f, indent=2)
+        json.dump({"metrics":metrics,"last_equity":last_eq}, f, indent=2)
     return BTResult(equity_curve=eq, trades=trades, metrics=metrics)
 
 if __name__ == "__main__":

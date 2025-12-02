@@ -49,11 +49,26 @@ class Explanation(BaseModel):
 
 @app.get("/signals", response_model=list[Signal])
 def get_signals():
-    df = load_data()
+    """Obtener señales de trading con datos frescos de yfinance"""
+    # Cargar datos directamente con yfinance (sin cache)
+    from mvpfx.data import fetch_yfinance
+    
+    # Obtener datos frescos (250 barras para tener suficiente después del warmup)
+    df = fetch_yfinance(cfg["symbol"], cfg["timeframe"], 250)
+    
+    # Calcular indicadores
     df = compute_all_indicators(df, cfg)
-    df = generate_signals(df, cfg).iloc[cfg["warmup_bars"]:]
+    
+    # Aplicar warmup ANTES de generar señales
+    warmup = cfg["warmup_bars"]
+    df = df.iloc[warmup:].copy()
+    
+    # Generar señales
+    df = generate_signals(df, cfg)
+    
+    # Retornar TODAS las barras (no solo las últimas 200)
     out = []
-    for ts, row in df.tail(200).iterrows():
+    for ts, row in df.iterrows():
         out.append(Signal(
             timestamp=ts.isoformat(),
             open=float(row["open"]),

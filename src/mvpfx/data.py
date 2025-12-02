@@ -34,6 +34,81 @@ def simulate_ohlcv(bars: int, timeframe: TF, seed: int = 42) -> pd.DataFrame:
     df = pd.DataFrame({"open":open_, "high":high, "low":low, "close":close, "volume":vol_ticks}, index=idx)
     return df
 
+def fetch_yfinance(symbol: str, timeframe: TF, bars: int = 3000) -> pd.DataFrame:
+    """
+    Obtiene datos OHLCV usando yfinance (Yahoo Finance).
+    
+    Args:
+        symbol: Símbolo del instrumento (ej: "EURUSD=X" para Forex, "AAPL" para acciones)
+        timeframe: M1, M5, M15, H1
+        bars: Número de barras a descargar
+    
+    Returns:
+        DataFrame con índice timestamp y columnas [open, high, low, close, volume]
+    """
+    try:
+        import yfinance as yf
+    except ImportError:
+        raise ImportError(
+            "yfinance no está instalado. Ejecuta: pip install yfinance"
+        )
+    
+    # Mapeo de timeframes a intervalos de yfinance
+    interval_map = {
+        "M1": "1m",
+        "M5": "5m",
+        "M15": "15m",
+        "H1": "1h"
+    }
+    
+    interval = interval_map.get(timeframe.upper())
+    if not interval:
+        raise ValueError(f"Timeframe no soportado: {timeframe}")
+    
+    # Calcular período requerido
+    minutes = timeframe_to_minutes(timeframe)
+    total_minutes = bars * minutes
+    
+    # yfinance tiene límites: máx 7 días para 1m, 60 días para intervalos < 1h
+    if interval == "1m":
+        period = min(total_minutes // (24 * 60), 7)
+        period_str = f"{period}d" if period > 0 else "1d"
+    elif interval in ["5m", "15m"]:
+        period = min(total_minutes // (24 * 60), 60)
+        period_str = f"{period}d" if period > 0 else "5d"
+    else:  # 1h o mayor
+        period = min(total_minutes // (24 * 60), 730)
+        period_str = f"{period}d" if period > 0 else "30d"
+    
+    # Normalizar símbolo para Forex
+    if symbol.upper().replace(".", "") in ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"]:
+        yf_symbol = symbol.replace(".", "").upper() + "=X"
+    else:
+        yf_symbol = symbol
+    
+    # Descargar datos
+    ticker = yf.Ticker(yf_symbol)
+    df = ticker.history(period=period_str, interval=interval)
+    
+    if df.empty:
+        raise ValueError(f"No se obtuvieron datos para {yf_symbol} con intervalo {interval}")
+    
+    # Normalizar columnas (yfinance usa mayúsculas)
+    df.columns = df.columns.str.lower()
+    df = df[["open", "high", "low", "close", "volume"]]
+    
+    # Normalizar índice a UTC
+    if df.index.tz is None:
+        df.index = df.index.tz_localize("UTC")
+    else:
+        df.index = df.index.tz_convert("UTC")
+    
+    # Limitar a número de barras solicitadas
+    if len(df) > bars:
+        df = df.tail(bars)
+    
+    return df
+
 def load_data() -> pd.DataFrame:
     cfg = get_cfg()
     src = cfg["data"]["source"]
@@ -44,6 +119,10 @@ def load_data() -> pd.DataFrame:
         path = cfg["data"]["csv_path"]
         df = pd.read_csv(path, parse_dates=["timestamp"]).set_index("timestamp")
         df = df.tz_localize("UTC") if df.index.tz is None else df.tz_convert("UTC")
+    elif src == "yfinance":
+        symbol = cfg["symbol"]
+        bars = cfg["data"].get("bars", 3000)
+        df = fetch_yfinance(symbol, tf, bars)
     elif src == "ib":
         # Import lazy para evitar problemas de event loop en FastAPI
         import asyncio
@@ -64,7 +143,7 @@ def load_data() -> pd.DataFrame:
 if __name__ == "__main__":
     import argparse
     p = argparse.ArgumentParser(description="Preview/Export OHLCV")
-    p.add_argument("--source", choices=["simulated","csv","ib"], help="Override data.source")
+    p.add_argument("--source", choices=["simulated","csv","ib","yfinance"], help="Override data.source")
     p.add_argument("--bars", type=int, help="Override bars for simulated")
     p.add_argument("--out", type=str, help="Ruta CSV de salida")
     args = p.parse_args()
