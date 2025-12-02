@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MVP EUR/USD Dashboard (Paper)</title>
+  <title>MVP Trading Dashboard (Paper)</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -108,11 +108,186 @@
       margin-top: 0;
       color: #333;
     }
+
+    .signals-container {
+      max-height: 600px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+    }
+
+    .signals-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .signals-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .signals-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    .signals-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    .signal-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .signal-item:hover {
+      background: #f8f8f8;
+      border-radius: 4px;
+      padding-left: 8px;
+    }
+
+    .signal-item:last-child {
+      border-bottom: none;
+    }
+
+    .signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .signal-type {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .signal-time {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .signal-details {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .signal-price {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 4px 0;
+    }
+
+    .signal-explanation {
+      background: #f0f7ff;
+      padding: 8px;
+      border-radius: 4px;
+      margin-top: 8px;
+      font-size: 11px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .signal-item.expanded .signal-explanation {
+      display: block;
+    }
+
+    .expand-icon {
+      font-size: 10px;
+      color: #999;
+    }
+
+    .active-signal-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .active-signal-box h3 {
+      margin: 0 0 8px 0;
+      color: white;
+      font-size: 16px;
+    }
+
+    .active-signal-type {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    .active-signal-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .detail-item {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .detail-label {
+      font-size: 10px;
+      opacity: 0.8;
+      text-transform: uppercase;
+    }
+
+    .detail-value {
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: #fafafa;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      border: 1px solid #eee;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .period-info {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #666;
+      margin-top: 12px;
+      border-left: 3px solid #667eea;
+    }
   </style>
 </head>
 
 <body>
-  <h2>📊 MVP EUR/USD — Paper Trading Dashboard</h2>
+  <h2>📊 MVP Trading — Paper Trading Dashboard <small style="color: #999; font-size: 14px;">(v3.0 - ACTUALIZADO DIC 02 - 29 SEÑALES)</small></h2>
   <p class="muted">Esto es únicamente con fines educativos y no constituye asesoría financiera.</p>
 
   <div class="grid">
@@ -131,43 +306,64 @@
       </p>
     </div>
     <div class="card">
-      <h3>Métricas de Performance</h3>
-      <div class="kpis">
-        <div class="kpi">
-          <div>Equity Final</div>
-          <h3 id="eqFinal">$—</h3>
-        </div>
-        <div class="kpi">
-          <div>Max Drawdown</div>
-          <h3 id="dd">—</h3>
-        </div>
-        <div class="kpi">
-          <div>Sharpe</div>
-          <h3 id="sharpe">—</h3>
+      <h3>📊 Estado del Trading</h3>
+      
+      <!-- Señal Activa -->
+      <div id="activeSignalBox" class="active-signal-box" style="display: none;">
+        <h3>🎯 SEÑAL ACTIVA</h3>
+        <div class="active-signal-type" id="activeSignalType">—</div>
+        <div class="active-signal-details">
+          <div class="detail-item">
+            <div class="detail-label">Precio</div>
+            <div class="detail-value" id="activePrice">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Stop Loss</div>
+            <div class="detail-value" id="activeSL">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Take Profit</div>
+            <div class="detail-value" id="activeTP">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">R/R Ratio</div>
+            <div class="detail-value" id="activeRR">—</div>
+          </div>
         </div>
       </div>
-      <div class="llm-box">
-        <strong>🤖 Explicación IA (Gemini)</strong>
-        <div id="llmText" class="muted" style="margin-top:8px;">Cargando explicación...</div>
+
+      <!-- Estadísticas de Señales -->
+      <h3 style="margin-bottom: 8px; margin-top: 16px;">📈 Estadísticas (<span id="signalsCount">0</span> señales)</h3>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">LONG (Compra)</div>
+          <div class="stat-value" style="color: #0a7f42;" id="longCount">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">SHORT (Venta)</div>
+          <div class="stat-value" style="color: #b00020;" id="shortCount">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Precio Mín</div>
+          <div class="stat-value" id="minPrice">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Precio Máx</div>
+          <div class="stat-value" id="maxPrice">—</div>
+        </div>
+      </div>
+      
+      <div class="period-info" id="periodInfo">
+        <strong>📅 Periodo:</strong> <span id="dateRange">—</span>
+      </div>
+      
+      <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 16px;">
+        <h3 style="margin-bottom: 12px;">📋 Historial de Señales</h3>
+        <div id="signalsContainer" class="signals-container">
+          <p class="muted" style="text-align: center; padding: 20px 0;">Cargando señales...</p>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="card" style="margin-top:16px;">
-    <h3>Señales de Trading Recientes (Últimas 50)</h3>
-    <table id="signalsTbl">
-      <thead>
-        <tr>
-          <th>Timestamp</th>
-          <th>Precio</th>
-          <th>Señal</th>
-          <th>Confianza</th>
-          <th>Stop Loss</th>
-          <th>Take Profit</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
@@ -209,97 +405,168 @@
     }
 
     async function init() {
+      console.log("🔄 Iniciando carga del dashboard...");
+      
       // Cargar datos
       const signals = await fetchJSON(`${API_BASE}/signals`, []);
+      console.log("📊 Señales cargadas:", signals.length);
+      
+      if (signals.length === 0) {
+        console.error("❌ No se recibieron señales de la API");
+        document.getElementById("signalsContainer").innerHTML = '<p class="muted" style="text-align: center; padding: 20px 0;">No hay señales disponibles</p>';
+        return;
+      }
+      
+      console.log("📈 Primera señal:", signals[0]);
+      console.log("📉 Última señal:", signals[signals.length - 1]);
+      
       const metrics = await loadMetrics();
 
-      // Encontrar última señal activa (long o short)
-      const lastSignal = signals.slice().reverse().find(s => s.signal !== 0);
+      // Cargar explicaciones
+      const explanations = await fetchJSON(`${API_BASE}/explanations`, { text: "Análisis de trading en progreso..." });
 
-      // Generar explicación contextual
-      let llmText = "Analizando señales de trading...";
-      if (lastSignal) {
-        const signalType = lastSignal.signal === 1 ? "LONG (Compra)" : "SHORT (Venta)";
-        const signalTime = new Date(lastSignal.timestamp).toLocaleString('es-ES', {
-          month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+      // Calcular estadísticas de señales
+      const signalsWithAction = signals.filter(s => s.signal !== 0);
+      const longSignalsData = signalsWithAction.filter(s => s.signal === 1);
+      const shortSignalsData = signalsWithAction.filter(s => s.signal === -1);
+      
+      // Actualizar estadísticas
+      document.getElementById("signalsCount").innerText = signalsWithAction.length;
+      document.getElementById("longCount").innerText = `${longSignalsData.length} (${((longSignalsData.length / signalsWithAction.length) * 100).toFixed(0)}%)`;
+      document.getElementById("shortCount").innerText = `${shortSignalsData.length} (${((shortSignalsData.length / signalsWithAction.length) * 100).toFixed(0)}%)`;
+      
+      // Calcular rango de precios
+      if (signalsWithAction.length > 0) {
+        const prices = signalsWithAction.map(s => s.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        document.getElementById("minPrice").innerText = `$${minPrice.toFixed(2)}`;
+        document.getElementById("maxPrice").innerText = `$${maxPrice.toFixed(2)}`;
+        
+        // Calcular rango de fechas
+        const firstSignal = new Date(signalsWithAction[0].timestamp);
+        const lastSignal = new Date(signalsWithAction[signalsWithAction.length - 1].timestamp);
+        document.getElementById("dateRange").innerText = `${firstSignal.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - ${lastSignal.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`;
+        
+        // Mostrar señal activa (la más reciente)
+        const lastActiveSignal = signalsWithAction[signalsWithAction.length - 1];
+        const activeBox = document.getElementById("activeSignalBox");
+        activeBox.style.display = "block";
+        
+        const signalType = lastActiveSignal.signal === 1 ? "🟢 LONG (Compra)" : "🔴 SHORT (Venta)";
+        const signalTime = new Date(lastActiveSignal.timestamp).toLocaleString('es-ES', {
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
         });
+        
+        document.getElementById("activeSignalType").innerText = `${signalType} - ${signalTime}`;
+        document.getElementById("activePrice").innerText = `$${lastActiveSignal.price.toFixed(2)}`;
+        document.getElementById("activeSL").innerText = lastActiveSignal.sl ? `$${lastActiveSignal.sl.toFixed(2)}` : "N/A";
+        document.getElementById("activeTP").innerText = lastActiveSignal.tp ? `$${lastActiveSignal.tp.toFixed(2)}` : "N/A";
+        
+        // Calcular Risk/Reward
+        if (lastActiveSignal.sl && lastActiveSignal.tp) {
+          const risk = Math.abs(lastActiveSignal.price - lastActiveSignal.sl);
+          const reward = Math.abs(lastActiveSignal.tp - lastActiveSignal.price);
+          const rr = reward / risk;
+          document.getElementById("activeRR").innerText = `1:${rr.toFixed(2)}`;
+        } else {
+          document.getElementById("activeRR").innerText = "N/A";
+        }
+      }
 
-        // Obtener explicación del LLM
-        const expl = await fetchJSON(`${API_BASE}/explanations`, { text: "Procesando análisis..." });
-
-        llmText = `📍 <strong>Última señal: ${signalType}</strong> (${signalTime})<br>
-        <strong>Precio:</strong> ${lastSignal.price.toFixed(5)} | 
-        <strong>Confianza:</strong> ${(lastSignal.score * 100).toFixed(0)}%<br>
-        <strong>SL:</strong> ${lastSignal.sl ? lastSignal.sl.toFixed(5) : "N/A"} | 
-        <strong>TP:</strong> ${lastSignal.tp ? lastSignal.tp.toFixed(5) : "N/A"}<br><br>
-        ${expl.text}`;
+      // Renderizar señales en panel lateral (orden inverso: más recientes primero)
+      console.log("🎯 Señales activas recibidas:", signalsWithAction.length);
+      console.log("📊 Total de barras recibidas:", signals.length);
+      
+      const container = document.getElementById("signalsContainer");
+      container.innerHTML = "";
+      
+      if (signalsWithAction.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align: center; padding: 20px 0;">No hay señales activas</p>';
       } else {
-        const expl = await fetchJSON(`${API_BASE}/explanations`, { text: "No hay señales activas en el periodo analizado." });
-        llmText = expl.text;
-      }
-
-      // Actualizar explicación LLM con contexto
-      document.getElementById("llmText").innerHTML = llmText;
-
-      // Actualizar KPIs
-      if (metrics.last_equity) {
-        document.getElementById("eqFinal").innerText = "$" + metrics.last_equity.toFixed(2);
-      }
-      if (metrics.metrics) {
-        document.getElementById("dd").innerText = (metrics.metrics.MaxDrawdown * 100).toFixed(1) + "%";
-        document.getElementById("sharpe").innerText = metrics.metrics.Sharpe.toFixed(2);
-      }
-
-      // Render tabla de señales (ORDEN INVERSO: más recientes primero)
-      const tbody = document.querySelector("#signalsTbl tbody");
-      tbody.innerHTML = "";
-      const recentSignals = signals.slice(-50).reverse(); // INVERTIR ORDEN
-      recentSignals.forEach(s => {
-        const tr = document.createElement("tr");
-        const time = new Date(s.timestamp).toLocaleString('es-ES', {
-          month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+        // Mostrar señales en orden inverso (más recientes primero)
+        signalsWithAction.slice().reverse().forEach((s, index) => {
+          const signalType = s.signal === 1 ? "LONG" : "SHORT";
+          const signalClass = s.signal === 1 ? "signal-long" : "signal-short";
+          const signalIcon = s.signal === 1 ? "▲" : "▼";
+          const signalAction = s.signal === 1 ? "Compra" : "Venta";
+          
+          const time = new Date(s.timestamp).toLocaleString('es-ES', {
+            month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+          });
+          
+          const signalItem = document.createElement("div");
+          signalItem.className = "signal-item";
+          signalItem.dataset.index = index;
+          
+          signalItem.innerHTML = `
+            <div class="signal-header">
+              <span class="signal-type ${signalClass}">${signalIcon} ${signalType} (${signalAction})</span>
+              <span class="signal-time">${time}</span>
+            </div>
+            <div class="signal-price">Precio: $${s.price.toFixed(2)}</div>
+            <div class="signal-details">
+              <strong>Confianza:</strong> ${(s.score * 100).toFixed(0)}% | 
+              <strong>SL:</strong> ${s.sl ? s.sl.toFixed(2) : "N/A"} | 
+              <strong>TP:</strong> ${s.tp ? s.tp.toFixed(2) : "N/A"}
+            </div>
+            <div class="signal-explanation">
+              <strong>🤖 Explicación IA:</strong><br>
+              ${explanations.text || "Análisis técnico basado en cruces de EMAs y confirmación de indicadores."}
+            </div>
+            <div style="text-align: right; margin-top: 4px;">
+              <span class="expand-icon">▼ Ver más</span>
+            </div>
+          `;
+          
+          // Toggle explicación al hacer click
+          signalItem.addEventListener("click", function() {
+            this.classList.toggle("expanded");
+            const icon = this.querySelector(".expand-icon");
+            icon.textContent = this.classList.contains("expanded") ? "▲ Ver menos" : "▼ Ver más";
+          });
+          
+          container.appendChild(signalItem);
         });
-        tr.innerHTML = `
-      <td>${time}</td>
-      <td>${s.price.toFixed(5)}</td>
-      <td>${getSignalLabel(s.signal)}</td>
-      <td>${(s.score || 0).toFixed(2)}</td>
-      <td>${s.sl ? s.sl.toFixed(5) : "—"}</td>
-      <td>${s.tp ? s.tp.toFixed(5) : "—"}</td>
-    `;
-        tbody.appendChild(tr);
-      });
+      }
 
       // Preparar datos para gráfico de velas
+      console.log("🎨 Preparando gráfico...");
       const ctx = document.getElementById("priceChart").getContext("2d");
       const chartData = signals.slice(-100); // Últimas 100 barras para mejor visualización
+      console.log("📊 Barras para gráfico:", chartData.length);
 
-      // Crear datos de velas usando datos OHLC reales
-      const candlestickData = chartData.map(s => ({
-        x: new Date(s.timestamp).getTime(),
+      // Crear datos de velas usando ÍNDICES para evitar gaps en el eje X
+      const candlestickData = chartData.map((s, i) => ({
+        x: i,  // Usar índice en lugar de timestamp
         o: s.open,
         h: s.high,
         l: s.low,
-        c: s.close
+        c: s.close,
+        timestamp: s.timestamp  // Guardar timestamp para tooltips
       }));
 
       // Detectar señales para marcar en el gráfico
       const longSignals = chartData.map((s, i) => ({
-        x: new Date(s.timestamp).getTime(),
-        y: s.signal === 1 ? s.price : null
+        x: i,  // Usar índice
+        y: s.signal === 1 ? s.price : null,
+        timestamp: s.timestamp
       })).filter(p => p.y !== null);
 
       const shortSignals = chartData.map((s, i) => ({
-        x: new Date(s.timestamp).getTime(),
-        y: s.signal === -1 ? s.price : null
+        x: i,  // Usar índice
+        y: s.signal === -1 ? s.price : null,
+        timestamp: s.timestamp
       })).filter(p => p.y !== null);
+
+      console.log("✅ Datos preparados - Velas:", candlestickData.length, "| LONG:", longSignals.length, "| SHORT:", shortSignals.length);
 
       const chart = new Chart(ctx, {
         type: "candlestick",
         data: {
           datasets: [
             {
-              label: "EUR/USD",
+              label: signals.length > 0 ? "Precio" : "EUR/USD",  // Etiqueta genérica
               data: candlestickData,
               color: {
                 up: '#26a69a',
@@ -346,10 +613,21 @@
               mode: 'index',
               intersect: false,
               callbacks: {
+                title: function(context) {
+                  // Mostrar timestamp real en el tooltip
+                  const index = context[0].parsed.x;
+                  if (chartData[index]) {
+                    const date = new Date(chartData[index].timestamp);
+                    return date.toLocaleString('es-ES', {
+                      month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                    });
+                  }
+                  return '';
+                },
                 label: function (context) {
                   const label = context.dataset.label || '';
                   if (context.parsed.y !== undefined) {
-                    return label + ': ' + context.parsed.y.toFixed(5);
+                    return label + ': ' + context.parsed.y.toFixed(2);
                   }
                   return label;
                 }
@@ -386,18 +664,22 @@
           },
           scales: {
             x: {
-              type: 'time',
-              time: {
-                unit: 'hour',
-                displayFormats: {
-                  hour: 'MMM dd HH:mm'
-                }
-              },
+              type: 'linear',  // Cambiar de 'time' a 'linear'
               ticks: {
                 maxRotation: 45,
                 minRotation: 45,
                 autoSkip: true,
-                maxTicksLimit: 10
+                maxTicksLimit: 10,
+                callback: function(value, index) {
+                  // Mostrar timestamps cada N barras
+                  if (chartData[value]) {
+                    const date = new Date(chartData[value].timestamp);
+                    return date.toLocaleString('es-ES', {
+                      month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                    });
+                  }
+                  return '';
+                }
               }
             },
             y: {
@@ -405,7 +687,7 @@
               position: 'right',
               ticks: {
                 callback: function (value) {
-                  return value.toFixed(5);
+                  return value.toFixed(2);  // Ajustado para acciones
                 }
               }
             }
