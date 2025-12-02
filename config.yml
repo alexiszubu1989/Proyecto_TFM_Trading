@@ -1,13 +1,13 @@
 # --- Configuración global ---
-symbol: "EUR.USD"
+symbol: "AAPL"
 timezone: "UTC"            # TODO: los datos se normalizan a UTC
-timeframe: "M5"            # M1|M5|M15|H1
-warmup_bars: 200           # barras para calcular indicadores sin señales
+timeframe: "M5"            # M1|M5|M15|H1 - Cambiado a M5 para tener más datos históricos
+warmup_bars: 50            # Reducido para que queden datos después del warmup
 
 # --- Ventanas indicadores ---
 indicators:
-  ema_fast: 12             # típica MACD
-  ema_slow: 26
+  ema_fast: 3              # ⚡⚡ ULTRA-RÁPIDA: Máxima generación de señales
+  ema_slow: 8              # ⚡⚡ ULTRA-RÁPIDA: Máxima generación de señales
   rsi_period: 14
   macd_signal: 9
   atr_period: 14
@@ -16,11 +16,11 @@ indicators:
 
 # --- Estrategia y filtros ---
 strategy:
-  rsi_long_min: 55         # RSI debe estar por encima (no sobreventa)
-  rsi_short_max: 45        # RSI por debajo (no sobrecompra)
-  macd_confirm: true
-  min_atr_pct: 0.0003      # ATR/Close mínimo (ej. 3 pips por mil)
-  regime_threshold: 0.0001 # |EMAf-EMAs|/Close para "tendencia"
+  rsi_long_min: 0          # 🔓 SIN FILTRO RSI: Permite todas las compras
+  rsi_short_max: 100       # 🔓 SIN FILTRO RSI: Permite todas las ventas
+  macd_confirm: false      # Desactivar para más señales
+  min_atr_pct: 0.0         # 🔓 SIN FILTRO: Acepta cualquier volatilidad
+  regime_threshold: 0.0    # 🔓 SIN FILTRO: Acepta cualquier régimen
 
 # --- Riesgo y ejecución ---
 risk:
@@ -31,18 +31,18 @@ risk:
   trailing_mult: 0.0       # 0 desactiva trailing
   daily_loss_limit: 0.03   # 3% del capital
   max_trades_per_day: 6
-  max_position_units: 100000  # cap unidades
-  min_position_units: 1000
+  max_position_units: 1000    # cap unidades (reducido para acciones)
+  min_position_units: 1       # mínimo 1 acción
 
 execution:
-  simulate_spread: 0.00005     # ~0.5 pips
-  simulate_slippage: 0.00002   # ~0.2 pips
+  simulate_spread: 0.01        # $0.01 spread para acciones
+  simulate_slippage: 0.005     # $0.005 slippage
 
 # --- Datos ---
 data:
-  source: "ib"             # "simulated" | "ib" | "csv"
+  source: "yfinance"             # "simulated" | "ib" | "csv" | "yfinance"
   csv_path: "./data/eurusd.csv"   # si source=csv
-  bars: 3000
+  bars: 250                      # Suficiente para M5 con warmup de 50
   seed: 42
 
 # --- API ---
