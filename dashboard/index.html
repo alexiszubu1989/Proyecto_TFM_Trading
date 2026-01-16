@@ -283,27 +283,324 @@
       margin-top: 12px;
       border-left: 3px solid #667eea;
     }
+
+    /* Estilos para selectores */
+    select:focus {
+      outline: none;
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    select:hover {
+      border-color: #764ba2;
+    }
+
+    .controls-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+    }
+
+    /* Estilo para el contenedor del gráfico */
+    #chartContainer {
+      background: #fff;
+      border-radius: 4px;
+    }
+
+    /* ========== ESTILOS PARA ANÁLISIS LLM ========== */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #generateAnalysisBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+    }
+
+    #generateAnalysisBtn:active {
+      transform: translateY(0);
+    }
+
+    #generateAnalysisBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .accordion-header:hover {
+      filter: brightness(1.1);
+    }
+
+    #analysisAccordionContent::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #analysisAccordionContent::-webkit-scrollbar-track {
+      background: rgba(15, 52, 96, 0.3);
+      border-radius: 4px;
+    }
+
+    #analysisAccordionContent::-webkit-scrollbar-thumb {
+      background: #e94560;
+      border-radius: 4px;
+    }
+
+    #analysisAccordionContent::-webkit-scrollbar-thumb:hover {
+      background: #ff6b6b;
+    }
+
+    /* Estilos para el texto del análisis */
+    #analysisText h1, #analysisText h2, #analysisText h3 {
+      color: #e94560;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    #analysisText strong {
+      color: #4fc3f7;
+    }
+
+    #analysisText em {
+      color: #81c784;
+    }
+
+    #analysisText code {
+      background: rgba(233, 69, 96, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Consolas', monospace;
+    }
+    /* ========== FIN ESTILOS ANÁLISIS LLM ========== */
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <h2>📊 MVP Trading — Paper Trading Dashboard <small style="color: #999; font-size: 14px;">(v3.0 - ACTUALIZADO DIC 02 - 29 SEÑALES)</small></h2>
+  <h2>📊 MVP Trading — Paper Trading Dashboard <small style="color: #999; font-size: 14px;">(v4.1 - CON ANÁLISIS LLM)</small>
+    <span id="refresh-indicator" style="float: right; font-size: 13px; font-weight: normal; color: #667eea; background: #e8f0fe; padding: 4px 12px; border-radius: 20px;">🔄 Auto-refresh en 60s</span>
+  </h2>
   <p class="muted">Esto es únicamente con fines educativos y no constituye asesoría financiera.</p>
+
+  <!-- Panel de Controles -->
+  <div class="card" style="margin-bottom: 16px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
+      <!-- Selector de Ticker -->
+      <div style="flex: 1; min-width: 180px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;">
+          📈 Ticker / Símbolo
+        </label>
+        <select id="tickerSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+          <option value="AAPL">AAPL - Apple Inc.</option>
+          <option value="MSFT">MSFT - Microsoft</option>
+          <option value="GOOGL">GOOGL - Alphabet</option>
+          <option value="AMZN">AMZN - Amazon</option>
+          <option value="TSLA">TSLA - Tesla</option>
+          <option value="META">META - Meta Platforms</option>
+          <option value="NVDA">NVDA - NVIDIA</option>
+          <option value="JPM">JPM - JPMorgan Chase</option>
+          <option value="V">V - Visa Inc.</option>
+          <option value="JNJ">JNJ - Johnson & Johnson</option>
+          <option value="EURUSD=X">EUR/USD - Euro/Dólar</option>
+          <option value="GBPUSD=X">GBP/USD - Libra/Dólar</option>
+          <option value="USDJPY=X">USD/JPY - Dólar/Yen</option>
+          <option value="BTC-USD">BTC/USD - Bitcoin</option>
+          <option value="ETH-USD">ETH/USD - Ethereum</option>
+          <option value="SPY">SPY - S&P 500 ETF</option>
+          <option value="QQQ">QQQ - NASDAQ 100 ETF</option>
+        </select>
+      </div>
+
+      <!-- Selector de Rango de Tiempo -->
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;">
+          📅 Rango Histórico
+        </label>
+        <select id="rangeSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+          <option value="0.02">1 Semana</option>
+          <option value="0.08" selected>1 Mes</option>
+          <option value="0.25">3 Meses</option>
+          <option value="0.5">6 Meses</option>
+          <option value="1">1 Año</option>
+          <option value="2">2 Años</option>
+          <option value="5">5 Años</option>
+          <option value="10">10 Años</option>
+        </select>
+      </div>
+
+      <!-- Selector de Intervalo de Velas -->
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;">
+          🕐 Intervalo de Velas
+        </label>
+        <select id="intervalSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+          <option value="1m">1 Minuto</option>
+          <option value="5m" selected>5 Minutos</option>
+          <option value="15m">15 Minutos</option>
+          <option value="1h">1 Hora</option>
+          <option value="1d">1 Día</option>
+          <option value="1mo">1 Mes</option>
+        </select>
+      </div>
+
+      <!-- Botón de Actualizar -->
+      <div style="min-width: 150px;">
+        <button id="loadDataBtn" style="width: 100%; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s;">
+          🔄 Cargar Datos
+        </button>
+      </div>
+    </div>
+    <p style="margin: 10px 0 0 0; font-size: 11px; color: #666;">
+      ⚠️ <strong>Nota:</strong> Intervalos de 1m y 5m están limitados a datos recientes (máx 7-60 días). Para mayor histórico, usa intervalos de 1h, 1d o 1mo.
+    </p>
+  </div>
 
   <div class="grid">
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="margin: 0;">Gráfico de Precios con Señales</h3>
+        <h3 style="margin: 0;">Gráfico de Precios con Señales - <span id="currentTicker">AAPL</span></h3>
         <button id="resetZoom"
           style="padding: 6px 12px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
           🔍 Resetear Zoom
         </button>
       </div>
-      <canvas id="priceChart" height="200"></canvas>
-      <p class="muted" style="margin-top: 8px; font-size: 11px;">
-        💡 <strong>Controles:</strong> Rueda del mouse para zoom | Arrastrar para desplazar (pan) | Click en "Resetear
-        Zoom" para volver a la vista original
+      <div id="loadingOverlay" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.9); padding: 20px 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 100;">
+        <div style="text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+          <div style="font-weight: 600;">Cargando datos...</div>
+        </div>
+      </div>
+      <!-- Contenedor del gráfico -->
+      <div id="chartContainer" style="width: 100%; height: 380px; position: relative;">
+        <canvas id="priceChart"></canvas>
+      </div>
+      <p id="chartNavHelp" class="muted" style="margin-top: 8px; font-size: 11px;">
+        💡 <strong>Controles:</strong> Rueda del mouse para zoom | Arrastrar para pan | "Resetear Zoom" para vista original
       </p>
+      
+      <!-- Contenedor de Detalle de Votación de Estrategias -->
+      <div id="votingDetailContainer" style="display: none; margin-top: 16px; background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); border-radius: 12px; padding: 16px; border: 2px solid #667eea; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; color: #333; font-size: 15px;">
+            🗳️ <span id="votingTitle">Detalle de Votación - Sistema de Estrategias</span>
+          </h4>
+          <button id="closeVotingDetail" onclick="document.getElementById('votingDetailContainer').style.display='none';" 
+                  style="background: #ff5252; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+        </div>
+        
+        <!-- Resumen de votación -->
+        <div id="votingSummary" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
+          <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ddd;">
+            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Señal Final</div>
+            <div id="votingFinalSignal" style="font-size: 18px; font-weight: bold; margin-top: 4px;">—</div>
+          </div>
+          <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #a5d6a7;">
+            <div style="font-size: 11px; color: #2e7d32; text-transform: uppercase;">Votos LONG</div>
+            <div id="votingLongCount" style="font-size: 18px; font-weight: bold; color: #2e7d32; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: #ffebee; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ef9a9a;">
+            <div style="font-size: 11px; color: #c62828; text-transform: uppercase;">Votos SHORT</div>
+            <div id="votingShortCount" style="font-size: 18px; font-weight: bold; color: #c62828; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #e0e0e0;">
+            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Neutral</div>
+            <div id="votingNeutralCount" style="font-size: 18px; font-weight: bold; color: #757575; margin-top: 4px;">0</div>
+          </div>
+        </div>
+        
+        <!-- Detalle por estrategia -->
+        <div id="strategyVotesGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <!-- Se llenará dinámicamente -->
+        </div>
+        
+        <!-- Información adicional -->
+        <div id="votingInfo" style="margin-top: 14px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 12px; color: #555;">
+          <strong>📊 Metodología:</strong> La señal final se determina por <em>votación mayoritaria</em>. Se requiere que al menos la mitad +1 de las estrategias coincidan para generar una señal. En caso de empate, se usa el <em>score promedio</em> como desempate.
+        </div>
+      </div>
+      
+      <!-- ========== CONTENEDOR DE ANÁLISIS LLM ========== -->
+      <div id="llmAnalysisContainer" style="margin-top: 16px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 16px; border: 2px solid #0f3460; box-shadow: 0 4px 20px rgba(15, 52, 96, 0.3);">
+        
+        <!-- Header con botón -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; color: #e94560; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">🤖</span> Análisis Inteligente con IA
+          </h4>
+          <button id="generateAnalysisBtn" onclick="generateLLMAnalysis()" 
+                  style="background: linear-gradient(135deg, #e94560 0%, #0f3460 100%); color: white; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);">
+            <span id="analysisButtonIcon">✨</span>
+            <span id="analysisButtonText">Generar Análisis</span>
+          </button>
+        </div>
+        
+        <!-- Info del análisis -->
+        <div style="background: rgba(233, 69, 96, 0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 3px solid #e94560;">
+          <p style="margin: 0; font-size: 12px; color: #a0a0a0; line-height: 1.5;">
+            <strong style="color: #e94560;">¿Qué hace?</strong> Analiza todas las señales del período usando <strong>Google Gemini</strong> para explicar cada decisión de trading, las estrategias evaluadas y la gestión de riesgo.
+          </p>
+        </div>
+        
+        <!-- Indicador de carga -->
+        <div id="analysisLoadingIndicator" style="display: none; text-align: center; padding: 40px 20px;">
+          <div style="display: inline-block; position: relative; width: 80px; height: 80px;">
+            <div style="position: absolute; width: 60px; height: 60px; border: 4px solid transparent; border-top-color: #e94560; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <div style="position: absolute; width: 45px; height: 45px; top: 7.5px; left: 7.5px; border: 4px solid transparent; border-top-color: #0f3460; border-radius: 50%; animation: spin 1.5s linear infinite reverse;"></div>
+            <div style="position: absolute; width: 30px; height: 30px; top: 15px; left: 15px; border: 4px solid transparent; border-top-color: #533483; border-radius: 50%; animation: spin 2s linear infinite;"></div>
+          </div>
+          <p style="margin-top: 16px; color: #e94560; font-weight: bold; font-size: 14px;">🧠 Analizando señales con IA...</p>
+          <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 12px;">Esto puede tomar unos segundos</p>
+        </div>
+        
+        <!-- Contenido del análisis (acordeón) -->
+        <div id="analysisContent" style="display: none;">
+          <!-- Resumen rápido -->
+          <div id="analysisSummary" style="background: rgba(15, 52, 96, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <div style="text-align: center;">
+              <div style="font-size: 11px; color: #a0a0a0; text-transform: uppercase;">Señales Analizadas</div>
+              <div id="analysisSignalCount" style="font-size: 24px; font-weight: bold; color: #e94560;">0</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 11px; color: #a0a0a0; text-transform: uppercase;">Fuente</div>
+              <div id="analysisSource" style="font-size: 14px; font-weight: bold; color: #0f3460; margin-top: 4px;">
+                <span style="background: linear-gradient(135deg, #4285f4, #34a853); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Google Gemini</span>
+              </div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 11px; color: #a0a0a0; text-transform: uppercase;">Caché</div>
+              <div id="analysisCacheStatus" style="font-size: 14px; font-weight: bold; margin-top: 4px;">—</div>
+            </div>
+          </div>
+          
+          <!-- Acordeón con el análisis completo -->
+          <div id="analysisAccordion" style="border-radius: 8px; overflow: hidden;">
+            <div class="accordion-header" onclick="toggleAnalysisAccordion()" style="background: linear-gradient(135deg, #0f3460 0%, #533483 100%); padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;">
+              <span style="color: white; font-weight: bold; font-size: 14px;">📋 Ver Análisis Detallado</span>
+              <span id="accordionIcon" style="color: white; font-size: 18px; transition: transform 0.3s ease;">▼</span>
+            </div>
+            <div id="analysisAccordionContent" style="display: none; background: rgba(26, 26, 46, 0.8); padding: 16px; max-height: 500px; overflow-y: auto;">
+              <div id="analysisText" style="color: #e0e0e0; font-size: 13px; line-height: 1.8; white-space: pre-wrap; font-family: 'Segoe UI', system-ui, sans-serif;"></div>
+            </div>
+          </div>
+          
+          <!-- Error si existe -->
+          <div id="analysisError" style="display: none; background: rgba(244, 67, 54, 0.1); border: 1px solid #f44336; border-radius: 8px; padding: 12px; margin-top: 12px;">
+            <p style="margin: 0; color: #f44336; font-size: 12px;">
+              <strong>⚠️ Aviso:</strong> <span id="analysisErrorText"></span>
+            </p>
+          </div>
+        </div>
+        
+        <!-- Estado vacío inicial -->
+        <div id="analysisEmpty" style="text-align: center; padding: 20px; color: #a0a0a0;">
+          <p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada de las señales.</p>
+        </div>
+      </div>
+      <!-- ========== FIN CONTENEDOR DE ANÁLISIS LLM ========== -->
+      
     </div>
     <div class="card">
       <h3>📊 Estado del Trading</h3>
@@ -373,6 +670,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
   <script>
     const API_BASE = "http://127.0.0.1:8000";
+    let currentChart = null;  // Para destruir el chart anterior
 
     async function fetchJSON(url, fallback) {
       try {
@@ -404,16 +702,116 @@
       return '<span class="signal-neutral">—</span>';
     }
 
+    function getSelectedParams() {
+      return {
+        ticker: document.getElementById('tickerSelect').value,
+        years: parseFloat(document.getElementById('rangeSelect').value),
+        interval: document.getElementById('intervalSelect').value
+      };
+    }
+
+    // Función para obtener el formato de fecha apropiado según el rango e intervalo
+    function getDateFormat(years, interval) {
+      // Para intervalos mensuales
+      if (interval === '1mo') {
+        if (years >= 5) {
+          return { format: { year: 'numeric' }, skipFactor: 12 };  // Solo año
+        } else if (years >= 2) {
+          return { format: { year: 'numeric', month: 'short' }, skipFactor: 6 };  // Año + mes
+        } else {
+          return { format: { year: '2-digit', month: 'short' }, skipFactor: 3 };  // Cada 3 meses
+        }
+      }
+      
+      // Para intervalos diarios
+      if (interval === '1d') {
+        if (years >= 5) {
+          return { format: { year: 'numeric' }, skipFactor: 365 };  // Solo año
+        } else if (years >= 2) {
+          return { format: { day: '2-digit', month: 'short', year: '2-digit' }, skipFactor: 90 };  // Día + mes + año cada 3 meses
+        } else if (years >= 1) {
+          return { format: { day: '2-digit', month: 'short', year: '2-digit' }, skipFactor: 30 };  // Cada mes con año
+        } else if (years >= 0.5) {
+          return { format: { day: '2-digit', month: 'short' }, skipFactor: 14 };  // Cada 2 semanas
+        } else {
+          return { format: { day: '2-digit', month: 'short' }, skipFactor: 7 };  // Cada semana
+        }
+      }
+      
+      // Para intervalos de hora
+      if (interval === '1h') {
+        if (years >= 1) {
+          return { format: { day: '2-digit', month: 'short', year: '2-digit' }, skipFactor: 168 };  // Cada semana con año
+        } else if (years >= 0.25) {
+          return { format: { day: '2-digit', month: 'short' }, skipFactor: 24 };  // Cada día
+        } else {
+          return { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: 12 };  // Cada 12h
+        }
+      }
+      
+      // Para intervalos de 15 minutos
+      if (interval === '15m') {
+        if (years >= 0.08) {
+          return { format: { month: 'short', day: '2-digit' }, skipFactor: 96 };  // Cada día
+        } else {
+          return { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: 16 };  // Cada 4h
+        }
+      }
+      
+      // Para intervalos de 5 minutos o 1 minuto
+      if (interval === '5m' || interval === '1m') {
+        if (years >= 0.02) {
+          return { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: interval === '1m' ? 60 : 24 };  // Cada hora o 2h
+        } else {
+          return { format: { hour: '2-digit', minute: '2-digit' }, skipFactor: interval === '1m' ? 30 : 12 };  // Cada 30m o 1h
+        }
+      }
+      
+      // Default
+      return { format: { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: 10 };
+    }
+
+    function showLoading(show) {
+      const overlay = document.getElementById('loadingOverlay');
+      const chartCard = document.querySelector('.card');
+      if (overlay) {
+        overlay.style.display = show ? 'block' : 'none';
+      }
+      if (chartCard) {
+        chartCard.style.position = show ? 'relative' : '';
+      }
+    }
+
     async function init() {
       console.log("🔄 Iniciando carga del dashboard...");
       
+      const params = getSelectedParams();
+      console.log("📊 Parámetros:", params);
+      
+      // Actualizar título con ticker actual
+      document.getElementById('currentTicker').innerText = params.ticker;
+      
+      showLoading(true);
+      
+      // Construir URL con parámetros
+      const url = `${API_BASE}/signals?ticker=${encodeURIComponent(params.ticker)}&years=${params.years}&interval=${params.interval}`;
+      console.log("🌐 Consultando:", url);
+      
       // Cargar datos
-      const signals = await fetchJSON(`${API_BASE}/signals`, []);
+      const signals = await fetchJSON(url, []);
       console.log("📊 Señales cargadas:", signals.length);
+      
+      showLoading(false);
       
       if (signals.length === 0) {
         console.error("❌ No se recibieron señales de la API");
-        document.getElementById("signalsContainer").innerHTML = '<p class="muted" style="text-align: center; padding: 20px 0;">No hay señales disponibles</p>';
+        document.getElementById("signalsContainer").innerHTML = `
+          <div style="text-align: center; padding: 30px;">
+            <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
+            <p class="muted">No hay datos disponibles para <strong>${params.ticker}</strong></p>
+            <p class="muted" style="font-size: 11px;">Prueba con un rango de tiempo mayor o un intervalo diferente</p>
+          </div>
+        `;
         return;
       }
       
@@ -443,10 +841,21 @@
         document.getElementById("minPrice").innerText = `$${minPrice.toFixed(2)}`;
         document.getElementById("maxPrice").innerText = `$${maxPrice.toFixed(2)}`;
         
-        // Calcular rango de fechas
+        // Calcular rango de fechas con año incluido
         const firstSignal = new Date(signalsWithAction[0].timestamp);
         const lastSignal = new Date(signalsWithAction[signalsWithAction.length - 1].timestamp);
-        document.getElementById("dateRange").innerText = `${firstSignal.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - ${lastSignal.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`;
+        
+        // Formato de fecha para el periodo según el intervalo
+        let periodDateFormat;
+        if (params.interval === '1mo') {
+          periodDateFormat = { month: 'short', year: 'numeric' };
+        } else if (params.interval === '1d' && params.years >= 1) {
+          periodDateFormat = { day: '2-digit', month: 'short', year: '2-digit' };
+        } else {
+          periodDateFormat = { day: '2-digit', month: 'short', year: '2-digit' };
+        }
+        
+        document.getElementById("dateRange").innerText = `${firstSignal.toLocaleDateString('es-ES', periodDateFormat)} - ${lastSignal.toLocaleDateString('es-ES', periodDateFormat)}`;
         
         // Mostrar señal activa (la más reciente)
         const lastActiveSignal = signalsWithAction[signalsWithAction.length - 1];
@@ -454,9 +863,18 @@
         activeBox.style.display = "block";
         
         const signalType = lastActiveSignal.signal === 1 ? "🟢 LONG (Compra)" : "🔴 SHORT (Venta)";
-        const signalTime = new Date(lastActiveSignal.timestamp).toLocaleString('es-ES', {
-          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-        });
+        
+        // Fecha completa para la señal activa
+        const activeSignalDate = new Date(lastActiveSignal.timestamp);
+        let activeSignalFormat;
+        if (params.interval === '1mo') {
+          activeSignalFormat = { month: 'long', year: 'numeric' };
+        } else if (params.interval === '1d') {
+          activeSignalFormat = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+        } else {
+          activeSignalFormat = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+        }
+        const signalTime = activeSignalDate.toLocaleString('es-ES', activeSignalFormat);
         
         document.getElementById("activeSignalType").innerText = `${signalType} - ${signalTime}`;
         document.getElementById("activePrice").innerText = `$${lastActiveSignal.price.toFixed(2)}`;
@@ -484,6 +902,25 @@
       if (signalsWithAction.length === 0) {
         container.innerHTML = '<p class="muted" style="text-align: center; padding: 20px 0;">No hay señales activas</p>';
       } else {
+        // Determinar formato de fecha según el intervalo seleccionado
+        const getSignalDateFormat = (interval, years) => {
+          if (interval === '1m' || interval === '5m' || interval === '15m') {
+            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+          } else if (interval === '1h') {
+            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+          } else if (interval === '1d') {
+            if (years >= 2) {
+              return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+            }
+            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+          } else if (interval === '1mo') {
+            return { month: 'long', year: 'numeric' };
+          }
+          return { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+        };
+        
+        const signalDateFormat = getSignalDateFormat(params.interval, params.years);
+        
         // Mostrar señales en orden inverso (más recientes primero)
         signalsWithAction.slice().reverse().forEach((s, index) => {
           const signalType = s.signal === 1 ? "LONG" : "SHORT";
@@ -491,25 +928,54 @@
           const signalIcon = s.signal === 1 ? "▲" : "▼";
           const signalAction = s.signal === 1 ? "Compra" : "Venta";
           
-          const time = new Date(s.timestamp).toLocaleString('es-ES', {
-            month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+          // Fecha completa de la señal
+          const signalDate = new Date(s.timestamp);
+          const fullDate = signalDate.toLocaleString('es-ES', signalDateFormat);
+          
+          // Fecha corta para el header
+          const shortDate = signalDate.toLocaleString('es-ES', {
+            day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit'
           });
+          
+          // Verificar si tiene datos de votación
+          const hasVotingData = s.strategy_votes && s.strategy_votes.length > 0;
           
           const signalItem = document.createElement("div");
           signalItem.className = "signal-item";
           signalItem.dataset.index = index;
+          signalItem.dataset.timestamp = s.timestamp;
+          signalItem.style.cursor = hasVotingData ? "pointer" : "default";
+          
+          // Guardar datos de votación en el elemento
+          if (hasVotingData) {
+            signalItem.dataset.strategyVotes = JSON.stringify(s.strategy_votes);
+            signalItem.dataset.longVotes = s.long_votes || 0;
+            signalItem.dataset.shortVotes = s.short_votes || 0;
+            signalItem.dataset.neutralVotes = s.neutral_votes || 0;
+            signalItem.dataset.finalSignal = s.signal;
+            signalItem.dataset.price = s.price;
+            signalItem.dataset.score = s.score;
+          }
+          
+          const votingBadge = hasVotingData 
+            ? `<span style="background: #667eea; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 8px;">🗳️ ${s.long_votes || 0}L / ${s.short_votes || 0}S</span>`
+            : '';
           
           signalItem.innerHTML = `
             <div class="signal-header">
-              <span class="signal-type ${signalClass}">${signalIcon} ${signalType} (${signalAction})</span>
-              <span class="signal-time">${time}</span>
+              <span class="signal-type ${signalClass}">${signalIcon} ${signalType} (${signalAction}) ${votingBadge}</span>
+              <span class="signal-time">${shortDate}</span>
+            </div>
+            <div class="signal-date" style="font-size: 11px; color: #667eea; margin-bottom: 4px; font-weight: 500;">
+              📅 ${fullDate}
             </div>
             <div class="signal-price">Precio: $${s.price.toFixed(2)}</div>
             <div class="signal-details">
               <strong>Confianza:</strong> ${(s.score * 100).toFixed(0)}% | 
-              <strong>SL:</strong> ${s.sl ? s.sl.toFixed(2) : "N/A"} | 
-              <strong>TP:</strong> ${s.tp ? s.tp.toFixed(2) : "N/A"}
+              <strong>SL:</strong> $${s.sl ? s.sl.toFixed(2) : "N/A"} | 
+              <strong>TP:</strong> $${s.tp ? s.tp.toFixed(2) : "N/A"}
             </div>
+            ${hasVotingData ? '<div style="text-align: center; margin-top: 6px; font-size: 11px; color: #667eea;">👆 Clic para ver detalle de votación</div>' : ''}
             <div class="signal-explanation">
               <strong>🤖 Explicación IA:</strong><br>
               ${explanations.text || "Análisis técnico basado en cruces de EMAs y confirmación de indicadores."}
@@ -519,8 +985,12 @@
             </div>
           `;
           
-          // Toggle explicación al hacer click
-          signalItem.addEventListener("click", function() {
+          // Evento de clic para mostrar detalle de votación
+          signalItem.addEventListener("click", function(e) {
+            if (hasVotingData) {
+              showVotingDetail(this);
+            }
+            // Toggle explicación
             this.classList.toggle("expanded");
             const icon = this.querySelector(".expand-icon");
             icon.textContent = this.classList.contains("expanded") ? "▲ Ver menos" : "▼ Ver más";
@@ -533,7 +1003,16 @@
       // Preparar datos para gráfico de velas
       console.log("🎨 Preparando gráfico...");
       const ctx = document.getElementById("priceChart").getContext("2d");
-      const chartData = signals.slice(-100); // Últimas 100 barras para mejor visualización
+      
+      // Destruir chart anterior si existe
+      if (currentChart) {
+        currentChart.destroy();
+        currentChart = null;
+      }
+      
+      // Limitar datos para mejor visualización (máx 500 barras)
+      const maxBars = 500;
+      const chartData = signals.length > maxBars ? signals.slice(-maxBars) : signals;
       console.log("📊 Barras para gráfico:", chartData.length);
 
       // Crear datos de velas usando ÍNDICES para evitar gaps en el eje X
@@ -561,7 +1040,11 @@
 
       console.log("✅ Datos preparados - Velas:", candlestickData.length, "| LONG:", longSignals.length, "| SHORT:", shortSignals.length);
 
-      const chart = new Chart(ctx, {
+      // Obtener formato de fecha dinámico según rango e intervalo
+      const dateFormatConfig = getDateFormat(params.years, params.interval);
+      console.log("📅 Formato de fecha:", dateFormatConfig);
+
+      currentChart = new Chart(ctx, {
         type: "candlestick",
         data: {
           datasets: [
@@ -603,7 +1086,7 @@
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,  // Permitir que el gráfico llene el contenedor
           plugins: {
             legend: {
               display: true,
@@ -612,24 +1095,58 @@
             tooltip: {
               mode: 'index',
               intersect: false,
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: '#667eea',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: true,
               callbacks: {
                 title: function(context) {
-                  // Mostrar timestamp real en el tooltip
+                  // Mostrar fecha completa en el tooltip
                   const index = context[0].parsed.x;
                   if (chartData[index]) {
                     const date = new Date(chartData[index].timestamp);
                     return date.toLocaleString('es-ES', {
-                      month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+                      weekday: 'short',
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     });
                   }
                   return '';
                 },
                 label: function (context) {
-                  const label = context.dataset.label || '';
-                  if (context.parsed.y !== undefined) {
-                    return label + ': ' + context.parsed.y.toFixed(2);
+                  const datasetLabel = context.dataset.label || '';
+                  const index = context.parsed.x;
+                  
+                  // Para el dataset de velas (candlestick), mostrar OHLC
+                  if (datasetLabel === 'Precio' && chartData[index]) {
+                    const candle = chartData[index];
+                    return [
+                      `Apertura: $${candle.open.toFixed(2)}`,
+                      `Máximo: $${candle.high.toFixed(2)}`,
+                      `Mínimo: $${candle.low.toFixed(2)}`,
+                      `Cierre: $${candle.close.toFixed(2)}`
+                    ];
                   }
-                  return label;
+                  
+                  // Para señales LONG/SHORT
+                  if (context.parsed.y !== undefined && context.parsed.y !== null) {
+                    return `${datasetLabel}: $${context.parsed.y.toFixed(2)}`;
+                  }
+                  return null;
+                },
+                labelColor: function(context) {
+                  if (context.dataset.label === 'LONG ▲') {
+                    return { borderColor: '#4CAF50', backgroundColor: '#4CAF50' };
+                  } else if (context.dataset.label === 'SHORT ▼') {
+                    return { borderColor: '#F44336', backgroundColor: '#F44336' };
+                  }
+                  return { borderColor: '#667eea', backgroundColor: '#667eea' };
                 }
               }
             },
@@ -664,22 +1181,36 @@
           },
           scales: {
             x: {
-              type: 'linear',  // Cambiar de 'time' a 'linear'
+              type: 'linear',
+              min: 0,  // Empezar desde el inicio de los datos
+              max: chartData.length - 1,  // Terminar en el último dato
               ticks: {
                 maxRotation: 45,
-                minRotation: 45,
+                minRotation: 0,
                 autoSkip: true,
-                maxTicksLimit: 10,
+                autoSkipPadding: 15,
+                maxTicksLimit: 12,
                 callback: function(value, index) {
-                  // Mostrar timestamps cada N barras
+                  // Solo mostrar etiquetas para valores enteros válidos
+                  if (!Number.isInteger(value) || value < 0 || value >= chartData.length) return '';
+                  
+                  // Calcular factor de salto dinámico basado en cantidad de datos
+                  const dynamicSkip = Math.max(1, Math.floor(chartData.length / 10));
+                  if (value % dynamicSkip !== 0 && value !== chartData.length - 1) return '';
+                  
                   if (chartData[value]) {
                     const date = new Date(chartData[value].timestamp);
-                    return date.toLocaleString('es-ES', {
-                      month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
-                    });
+                    return date.toLocaleString('es-ES', dateFormatConfig.format);
                   }
                   return '';
+                },
+                font: {
+                  size: 10
                 }
+              },
+              grid: {
+                display: true,
+                color: 'rgba(0, 0, 0, 0.05)'
               }
             },
             y: {
@@ -702,13 +1233,371 @@
 
       // Botón para resetear zoom
       document.getElementById('resetZoom').addEventListener('click', function () {
-        chart.resetZoom();
+        if (currentChart) {
+          currentChart.resetZoom();
+        }
       });
     }
 
-    // Recargar cada 30 segundos
+    // Event listeners para los controles
+    document.getElementById('loadDataBtn').addEventListener('click', function() {
+      init();
+    });
+
+    // Agregar efecto hover al botón
+    const loadBtn = document.getElementById('loadDataBtn');
+    loadBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
+    });
+    loadBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+    });
+
+    // Actualizar automáticamente cuando cambia el intervalo (ajustar límites)
+    document.getElementById('intervalSelect').addEventListener('change', function() {
+      const interval = this.value;
+      const rangeSelect = document.getElementById('rangeSelect');
+      
+      // Mostrar advertencia si el intervalo tiene límites
+      if (interval === '1m') {
+        // Máx 7 días para 1m
+        if (parseFloat(rangeSelect.value) > 0.02) {
+          rangeSelect.value = '0.02';  // 1 semana
+        }
+      } else if (interval === '5m' || interval === '15m') {
+        // Máx 60 días
+        if (parseFloat(rangeSelect.value) > 0.17) {
+          rangeSelect.value = '0.08';  // 1 mes
+        }
+      }
+    });
+
+    // ==========================================
+    // FUNCIÓN PARA MOSTRAR DETALLE DE VOTACIÓN
+    // ==========================================
+    function showVotingDetail(signalElement) {
+      const container = document.getElementById('votingDetailContainer');
+      const strategyVotes = JSON.parse(signalElement.dataset.strategyVotes || '[]');
+      const longVotes = parseInt(signalElement.dataset.longVotes) || 0;
+      const shortVotes = parseInt(signalElement.dataset.shortVotes) || 0;
+      const neutralVotes = parseInt(signalElement.dataset.neutralVotes) || 0;
+      const finalSignal = parseInt(signalElement.dataset.finalSignal);
+      const price = parseFloat(signalElement.dataset.price);
+      const score = parseFloat(signalElement.dataset.score);
+      const timestamp = signalElement.dataset.timestamp;
+      
+      // Actualizar título con fecha
+      const signalDate = new Date(timestamp);
+      const dateStr = signalDate.toLocaleString('es-ES', {
+        weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      document.getElementById('votingTitle').innerHTML = 
+        `Detalle de Votación - <span style="color: #667eea;">${dateStr}</span> - Precio: <span style="color: #333;">$${price.toFixed(2)}</span>`;
+      
+      // Actualizar resumen
+      const finalSignalText = finalSignal === 1 ? '🟢 LONG' : finalSignal === -1 ? '🔴 SHORT' : '⚪ NEUTRAL';
+      const finalSignalColor = finalSignal === 1 ? '#2e7d32' : finalSignal === -1 ? '#c62828' : '#757575';
+      document.getElementById('votingFinalSignal').innerHTML = `<span style="color: ${finalSignalColor}">${finalSignalText}</span>`;
+      document.getElementById('votingLongCount').textContent = longVotes;
+      document.getElementById('votingShortCount').textContent = shortVotes;
+      document.getElementById('votingNeutralCount').textContent = neutralVotes;
+      
+      // Generar grid de estrategias
+      const strategyGrid = document.getElementById('strategyVotesGrid');
+      strategyGrid.innerHTML = '';
+      
+      // Nombres amigables para las estrategias
+      const strategyNames = {
+        'ema_crossover': '📈 EMA Crossover',
+        'rsi_reversal': '📊 RSI Reversal',
+        'macd_crossover': '📉 MACD Crossover',
+        'bollinger_breakout': '📐 Bollinger Breakout'
+      };
+      
+      // Descripciones cortas
+      const strategyDescriptions = {
+        'ema_crossover': 'Cruces de medias móviles exponenciales con filtros RSI/MACD',
+        'rsi_reversal': 'Reversión desde zonas de sobrecompra/sobreventa',
+        'macd_crossover': 'Cruces de MACD con confirmación de momentum',
+        'bollinger_breakout': 'Ruptura de bandas de Bollinger con tendencia fuerte'
+      };
+      
+      strategyVotes.forEach(vote => {
+        const voteColor = vote.vote === 'LONG' ? '#2e7d32' : vote.vote === 'SHORT' ? '#c62828' : '#757575';
+        const voteBg = vote.vote === 'LONG' ? '#e8f5e9' : vote.vote === 'SHORT' ? '#ffebee' : '#f5f5f5';
+        const voteBorder = vote.vote === 'LONG' ? '#a5d6a7' : vote.vote === 'SHORT' ? '#ef9a9a' : '#e0e0e0';
+        const voteIcon = vote.vote === 'LONG' ? '🟢' : vote.vote === 'SHORT' ? '🔴' : '⚪';
+        const scorePercent = (vote.score * 100).toFixed(0);
+        
+        const strategyCard = document.createElement('div');
+        strategyCard.style.cssText = `
+          background: ${voteBg};
+          padding: 12px;
+          border-radius: 8px;
+          border: 2px solid ${voteBorder};
+          transition: transform 0.2s ease;
+        `;
+        strategyCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 600; font-size: 13px; color: #333;">${strategyNames[vote.name] || vote.name}</span>
+            <span style="font-size: 16px;">${voteIcon}</span>
+          </div>
+          <div style="font-size: 20px; font-weight: bold; color: ${voteColor}; margin-bottom: 4px;">
+            ${vote.vote}
+          </div>
+          <div style="font-size: 11px; color: #666; margin-bottom: 4px;">
+            Score: <strong>${scorePercent}%</strong>
+          </div>
+          <div style="font-size: 10px; color: #888; line-height: 1.3;">
+            ${strategyDescriptions[vote.name] || 'Estrategia de trading algorítmico'}
+          </div>
+        `;
+        
+        strategyGrid.appendChild(strategyCard);
+      });
+      
+      // Actualizar información adicional
+      const totalVotes = longVotes + shortVotes + neutralVotes;
+      const majority = Math.ceil(totalVotes / 2) + (totalVotes % 2 === 0 ? 1 : 0);
+      const winningVotes = finalSignal === 1 ? longVotes : finalSignal === -1 ? shortVotes : 0;
+      const votingInfo = document.getElementById('votingInfo');
+      votingInfo.innerHTML = `
+        <strong>📊 Metodología:</strong> La señal final se determina por <em>votación mayoritaria</em>. 
+        Se requiere al menos <strong>${majority}/${totalVotes}</strong> votos para generar una señal. 
+        ${finalSignal !== 0 ? `<br><strong>Resultado:</strong> ${winningVotes} de ${totalVotes} estrategias votaron ${finalSignal === 1 ? 'LONG' : 'SHORT'} (${((winningVotes/totalVotes)*100).toFixed(0)}% consenso).` : ''}
+        <br><strong>Score final:</strong> ${(score * 100).toFixed(0)}% (promedio de estrategias coincidentes).
+      `;
+      
+      // Mostrar contenedor
+      container.style.display = 'block';
+      
+      // Scroll suave al contenedor de votación
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Cargar datos iniciales
     init();
-    setInterval(init, 30000);
+
+    // ==========================================
+    // AUTO-REFRESH: Actualización automática cada minuto
+    // ==========================================
+    let autoRefreshInterval = null;
+    let countdownInterval = null;
+    let secondsUntilRefresh = 60;
+
+    function startAutoRefresh() {
+      // Actualizar cada 60 segundos (60000 ms)
+      autoRefreshInterval = setInterval(() => {
+        console.log('🔄 Auto-refresh: Actualizando datos...');
+        init();
+        secondsUntilRefresh = 60;
+      }, 60000);
+
+      // Contador regresivo visible
+      countdownInterval = setInterval(() => {
+        secondsUntilRefresh--;
+        if (secondsUntilRefresh < 0) secondsUntilRefresh = 60;
+        updateRefreshIndicator();
+      }, 1000);
+
+      updateRefreshIndicator();
+    }
+
+    function updateRefreshIndicator() {
+      const indicator = document.getElementById('refresh-indicator');
+      if (indicator) {
+        indicator.textContent = `🔄 Auto-refresh en ${secondsUntilRefresh}s`;
+      }
+    }
+
+    // Resetear contador cuando el usuario carga manualmente
+    loadDataBtn.addEventListener('click', () => {
+      secondsUntilRefresh = 60;
+    });
+
+    // Iniciar auto-refresh
+    startAutoRefresh();
+    console.log('✅ Auto-refresh activado: actualización cada 60 segundos');
+
+    // ==========================================
+    // ANÁLISIS LLM: Funciones para generar análisis con IA
+    // ==========================================
+    
+    // Variable global para almacenar las señales cargadas
+    let loadedSignals = [];
+    
+    // Guardar señales cuando se cargan
+    const originalInit = init;
+    init = async function() {
+      await originalInit();
+      // Guardar las señales cargadas para el análisis LLM
+      const params = getSelectedParams();
+      const url = `${API_BASE}/signals?ticker=${encodeURIComponent(params.ticker)}&years=${params.years}&interval=${params.interval}`;
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          loadedSignals = await response.json();
+          console.log('📊 Señales guardadas para análisis LLM:', loadedSignals.filter(s => s.signal !== 0).length);
+        }
+      } catch (e) {
+        console.error('Error guardando señales para LLM:', e);
+      }
+    };
+    
+    async function generateLLMAnalysis() {
+      const btn = document.getElementById('generateAnalysisBtn');
+      const btnIcon = document.getElementById('analysisButtonIcon');
+      const btnText = document.getElementById('analysisButtonText');
+      const loadingIndicator = document.getElementById('analysisLoadingIndicator');
+      const analysisContent = document.getElementById('analysisContent');
+      const analysisEmpty = document.getElementById('analysisEmpty');
+      const analysisError = document.getElementById('analysisError');
+      
+      // Obtener parámetros actuales
+      const params = getSelectedParams();
+      
+      // Verificar si hay señales
+      const activeSignals = loadedSignals.filter(s => s.signal !== 0);
+      if (activeSignals.length === 0) {
+        alert('⚠️ No hay señales activas para analizar. Carga datos con señales primero.');
+        return;
+      }
+      
+      // Deshabilitar botón y mostrar loading
+      btn.disabled = true;
+      btnIcon.textContent = '⏳';
+      btnText.textContent = 'Analizando...';
+      loadingIndicator.style.display = 'block';
+      analysisContent.style.display = 'none';
+      analysisEmpty.style.display = 'none';
+      analysisError.style.display = 'none';
+      
+      console.log('🤖 Generando análisis LLM para', params.ticker, 'con', activeSignals.length, 'señales');
+      
+      try {
+        const response = await fetch(`${API_BASE}/analysis`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ticker: params.ticker,
+            signals: loadedSignals,
+            use_cache: true
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Análisis recibido:', result);
+        
+        // Mostrar resultados
+        document.getElementById('analysisSignalCount').textContent = result.signal_count;
+        document.getElementById('analysisCacheStatus').innerHTML = result.cached 
+          ? '<span style="color: #81c784;">✓ Desde caché</span>' 
+          : '<span style="color: #4fc3f7;">✓ Nuevo</span>';
+        
+        // Formatear y mostrar el texto del análisis
+        const formattedAnalysis = formatAnalysisText(result.analysis);
+        document.getElementById('analysisText').innerHTML = formattedAnalysis;
+        
+        // Mostrar error si existe
+        if (result.error) {
+          document.getElementById('analysisErrorText').textContent = result.error;
+          analysisError.style.display = 'block';
+        }
+        
+        // Mostrar contenido
+        loadingIndicator.style.display = 'none';
+        analysisContent.style.display = 'block';
+        
+        // Auto-expandir el acordeón
+        document.getElementById('analysisAccordionContent').style.display = 'block';
+        document.getElementById('accordionIcon').style.transform = 'rotate(180deg)';
+        
+      } catch (error) {
+        console.error('❌ Error en análisis LLM:', error);
+        loadingIndicator.style.display = 'none';
+        analysisEmpty.style.display = 'block';
+        analysisEmpty.innerHTML = `
+          <p style="margin: 0; font-size: 13px; color: #f44336;">
+            <strong>❌ Error:</strong> ${error.message}
+          </p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: #a0a0a0;">
+            Verifica que la API esté corriendo y que Google Gemini esté configurado.
+          </p>
+        `;
+      } finally {
+        // Rehabilitar botón
+        btn.disabled = false;
+        btnIcon.textContent = '✨';
+        btnText.textContent = 'Generar Análisis';
+      }
+    }
+    
+    function toggleAnalysisAccordion() {
+      const content = document.getElementById('analysisAccordionContent');
+      const icon = document.getElementById('accordionIcon');
+      
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+    
+    function formatAnalysisText(text) {
+      // Convertir markdown básico a HTML
+      let formatted = text
+        // Headers
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Code
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        // Line breaks
+        .replace(/\n/g, '<br>')
+        // Tags especiales del análisis
+        .replace(/&lt;analisis&gt;/g, '<div style="background: rgba(79, 195, 247, 0.1); border-left: 3px solid #4fc3f7; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #4fc3f7;">📊 Análisis:</strong><br>')
+        .replace(/&lt;\/analisis&gt;/g, '</div>')
+        .replace(/<analisis>/g, '<div style="background: rgba(79, 195, 247, 0.1); border-left: 3px solid #4fc3f7; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #4fc3f7;">📊 Análisis:</strong><br>')
+        .replace(/<\/analisis>/g, '</div>')
+        .replace(/&lt;explicacion_señal&gt;/g, '<div style="background: rgba(233, 69, 96, 0.1); border-left: 3px solid #e94560; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #e94560;">📝 Explicación:</strong><br>')
+        .replace(/&lt;\/explicacion_señal&gt;/g, '</div>')
+        .replace(/<explicacion_señal>/g, '<div style="background: rgba(233, 69, 96, 0.1); border-left: 3px solid #e94560; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #e94560;">📝 Explicación:</strong><br>')
+        .replace(/<\/explicacion_señal>/g, '</div>')
+        // Señales destacadas
+        .replace(/LONG/g, '<span style="color: #81c784; font-weight: bold;">LONG</span>')
+        .replace(/SHORT/g, '<span style="color: #ef5350; font-weight: bold;">SHORT</span>')
+        // Separador de señales
+        .replace(/---\s*SEÑAL/g, '<hr style="border: none; border-top: 2px solid #0f3460; margin: 20px 0;"><strong style="color: #e94560; font-size: 16px;">📍 SEÑAL');
+      
+      return formatted;
+    }
+    
+    // Resetear análisis cuando se cambian los datos
+    loadDataBtn.addEventListener('click', () => {
+      // Resetear el contenedor de análisis
+      document.getElementById('analysisContent').style.display = 'none';
+      document.getElementById('analysisEmpty').style.display = 'block';
+      document.getElementById('analysisEmpty').innerHTML = '<p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada de las señales.</p>';
+      document.getElementById('analysisAccordionContent').style.display = 'none';
+      document.getElementById('accordionIcon').style.transform = 'rotate(0deg)';
+    });
+    
+    console.log('✅ Sistema de análisis LLM cargado');
   </script>
 </body>
 
