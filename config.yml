@@ -13,14 +13,67 @@ indicators:
   atr_period: 14
   bb_period: 20
   bb_k: 2.0
+  # Nuevos indicadores
+  stoch_k: 14              # Período %K del Stochastic
+  stoch_d: 3               # Período %D del Stochastic (SMA de %K)
+  williams_period: 14      # Período Williams %R
+  adx_period: 14           # Período ADX
+  cci_period: 20           # Período CCI
+  momentum_period: 10      # Período Momentum
+  roc_period: 10           # Período Rate of Change
 
 # --- Estrategia y filtros ---
 strategy:
+  # Selector de estrategia
+  active_strategy: "ema_crossover"  # ema_crossover | rsi_reversal | macd_crossover | bollinger_breakout
+  combine_strategies: true           # ✅ ACTIVADO: Evaluar TODAS las estrategias por votación
+  enabled_strategies:                # Estrategias a evaluar
+    - "ema_crossover"
+    - "rsi_reversal"
+    - "macd_crossover"
+    - "bollinger_breakout"
+  min_strategy_votes: 2              # Mínimo de votos para confirmar señal (2 de 4 = 50%)
+  
+  # Método de desempate cuando hay igual número de votos LONG y SHORT
+  # Opciones: "score" | "priority" | "adx_trend" | "momentum" | "conservative"
+  tie_break_method: "score"          # Por defecto: mayor score promedio gana
+  
+  # Filtros originales (para ema_crossover)
   rsi_long_min: 0          # 🔓 SIN FILTRO RSI: Permite todas las compras
   rsi_short_max: 100       # 🔓 SIN FILTRO RSI: Permite todas las ventas
   macd_confirm: false      # Desactivar para más señales
   min_atr_pct: 0.0         # 🔓 SIN FILTRO: Acepta cualquier volatilidad
   regime_threshold: 0.0    # 🔓 SIN FILTRO: Acepta cualquier régimen
+
+# --- Configuración de Estrategias Individuales ---
+strategies:
+  # Estrategia 2: RSI Reversal
+  rsi_reversal:
+    rsi_oversold: 30           # Zona de sobreventa RSI
+    rsi_overbought: 70         # Zona de sobrecompra RSI
+    stoch_oversold: 20         # Zona de sobreventa Stochastic
+    stoch_overbought: 80       # Zona de sobrecompra Stochastic
+    williams_oversold: -80     # Williams %R sobreventa
+    williams_overbought: -20   # Williams %R sobrecompra
+    adx_max: 25                # ADX máximo (reversión mejor en rangos)
+  
+  # Estrategia 3: MACD Crossover
+  macd_crossover:
+    cci_long_threshold: 0      # CCI mínimo para LONG
+    cci_short_threshold: 0     # CCI máximo para SHORT
+    roc_threshold: 0           # ROC mínimo para confirmar
+    adx_min: 20                # ADX mínimo (tendencia requerida)
+  
+  # Estrategia 4: Bollinger Breakout
+  bollinger_breakout:
+    adx_strong: 25             # ADX para tendencia fuerte
+    momentum_threshold: 0      # Momentum mínimo para confirmar
+    bb_distance_pct: 0.01      # Distancia mínima de la media (1%)
+  
+  # Configuración de desempate
+  tie_breaker:
+    adx_threshold: 25          # Umbral ADX para método "adx_trend"
+    momentum_threshold: 0      # Umbral momentum para método "momentum"
 
 # --- Riesgo y ejecución ---
 risk:
