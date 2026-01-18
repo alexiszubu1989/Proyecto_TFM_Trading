@@ -1,46 +1,220 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MVP Trading Dashboard (Paper)</title>
+  <title>TFM Trading Dashboard</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      margin: 16px;
-      background: #f5f5f5;
+    :root {
+      --color-bg: #f5f5f5;
+      --color-surface: #ffffff;
+      --color-border: #e0e0e0;
+      --color-border-light: #eee;
+      --color-text: #333;
+      --color-text-muted: #666;
+      --color-text-light: #999;
+      --color-primary: #667eea;
+      --color-primary-light: #e8f0fe;
+      --color-success: #0a7f42;
+      --color-success-light: #e8f5e9;
+      --color-danger: #b00020;
+      --color-danger-light: #ffebee;
+      --color-neutral: #757575;
+      --color-accent: #00b4d8;
+      --color-accent-dark: #0077b6;
+      --color-dark: #1a1a2e;
+      --color-dark-secondary: #16213e;
+      --color-dark-border: #0f3460;
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 20px;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 10px;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+      --font-xs: 10px;
+      --font-sm: 11px;
+      --font-md: 12px;
+      --font-base: 13px;
+      --font-lg: 14px;
+      --font-xl: 16px;
+      --font-2xl: 18px;
+      --font-3xl: 22px;
+      --font-4xl: 24px;
+      --transition-fast: 0.2s ease;
+      --transition-normal: 0.3s ease;
     }
 
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: var(--spacing-lg);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    /* Layout */
     .grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 16px;
+      gap: var(--spacing-lg);
     }
 
     .card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-md);
+      background: var(--color-surface);
     }
 
+    .card--gradient {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .card--dark {
+      background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-secondary) 100%);
+      border-color: var(--color-dark-border);
+    }
+
+    /* Typography */
+    .title {
+      margin: 0 0 var(--spacing-sm) 0;
+      font-size: var(--font-xl);
+      font-weight: 600;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: var(--font-md);
+      color: var(--color-text-muted);
+    }
+
+    .label {
+      display: block;
+      font-size: var(--font-md);
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .text-muted {
+      color: var(--color-text-muted);
+      font-size: var(--font-md);
+    }
+
+    .text-xs {
+      font-size: var(--font-xs);
+    }
+
+    .text-sm {
+      font-size: var(--font-sm);
+    }
+
+    .text-uppercase {
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-lg);
+      align-items: flex-end;
+    }
+
+    .control-group {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .control-group--wide {
+      min-width: 180px;
+    }
+
+    .select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-lg);
+      background: var(--color-surface);
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: var(--font-lg);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn--accent {
+      background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
+    }
+
+    .btn--danger {
+      background: linear-gradient(135deg, #e94560 0%, #0f3460 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+    }
+
+    .btn--small {
+      padding: 6px 12px;
+      font-size: var(--font-md);
+    }
+
+    .btn--full {
+      width: 100%;
+    }
+
+    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: var(--font-base);
     }
 
-    th,
-    td {
-      border-bottom: 1px solid #eee;
-      padding: 8px;
+    th, td {
+      border-bottom: 1px solid var(--color-border-light);
+      padding: var(--spacing-sm);
       text-align: right;
     }
 
-    th:first-child,
-    td:first-child {
+    th:first-child, td:first-child {
       text-align: left;
     }
 
@@ -49,71 +223,26 @@
       font-weight: 600;
     }
 
-    .kpis {
-      display: flex;
-      gap: 12px;
-    }
-
-    .kpi {
-      flex: 1;
-      background: #fafafa;
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .kpi h3 {
-      margin: 8px 0 0 0;
-      font-size: 24px;
-    }
-
-    .kpi div {
-      font-size: 12px;
-      color: #666;
-      text-transform: uppercase;
-    }
-
+    /* Signals */
     .signal-long {
-      color: #0a7f42;
+      color: var(--color-success);
       font-weight: bold;
     }
 
     .signal-short {
-      color: #b00020;
+      color: var(--color-danger);
       font-weight: bold;
     }
 
     .signal-neutral {
-      color: #666;
-    }
-
-    .muted {
-      color: #666;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .llm-box {
-      background: #f0f7ff;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 12px;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    h3 {
-      margin-top: 0;
-      color: #333;
+      color: var(--color-text-muted);
     }
 
     .signals-container {
       max-height: 600px;
       overflow-y: auto;
       overflow-x: hidden;
-      padding-right: 8px;
+      padding-right: var(--spacing-sm);
     }
 
     .signals-container::-webkit-scrollbar {
@@ -122,29 +251,25 @@
 
     .signals-container::-webkit-scrollbar-track {
       background: #f1f1f1;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
     }
 
     .signals-container::-webkit-scrollbar-thumb {
       background: #888;
-      border-radius: 4px;
-    }
-
-    .signals-container::-webkit-scrollbar-thumb:hover {
-      background: #555;
+      border-radius: var(--radius-sm);
     }
 
     .signal-item {
-      border-bottom: 1px solid #eee;
-      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border-light);
+      padding: var(--spacing-md) 0;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background var(--transition-fast);
     }
 
     .signal-item:hover {
       background: #f8f8f8;
-      border-radius: 4px;
-      padding-left: 8px;
+      border-radius: var(--radius-sm);
+      padding-left: var(--spacing-sm);
     }
 
     .signal-item:last-child {
@@ -155,37 +280,37 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: var(--spacing-sm);
     }
 
     .signal-type {
       font-weight: bold;
-      font-size: 14px;
+      font-size: var(--font-lg);
     }
 
     .signal-time {
-      font-size: 11px;
-      color: #999;
+      font-size: var(--font-sm);
+      color: var(--color-text-light);
     }
 
     .signal-details {
-      font-size: 12px;
-      color: #666;
+      font-size: var(--font-md);
+      color: var(--color-text-muted);
       line-height: 1.6;
     }
 
     .signal-price {
-      font-size: 14px;
+      font-size: var(--font-lg);
       font-weight: 600;
-      margin: 4px 0;
+      margin: var(--spacing-xs) 0;
     }
 
     .signal-explanation {
       background: #f0f7ff;
-      padding: 8px;
-      border-radius: 4px;
-      margin-top: 8px;
-      font-size: 11px;
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      margin-top: var(--spacing-sm);
+      font-size: var(--font-sm);
       line-height: 1.5;
       display: none;
     }
@@ -195,205 +320,709 @@
     }
 
     .expand-icon {
-      font-size: 10px;
-      color: #999;
+      font-size: var(--font-sm);
+      color: var(--color-primary);
+      cursor: pointer;
     }
 
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+    }
+
+    .stat-box {
+      background: #fafafa;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      border: 1px solid var(--color-border-light);
+    }
+
+    .stat-label {
+      font-size: var(--font-sm);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-value {
+      font-size: var(--font-xl);
+      font-weight: bold;
+    }
+
+    /* Active Signal Box */
     .active-signal-box {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--color-primary) 0%, #764ba2 100%);
       color: white;
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-lg);
     }
 
     .active-signal-box h3 {
-      margin: 0 0 8px 0;
-      color: white;
-      font-size: 16px;
+      margin: 0 0 var(--spacing-sm) 0;
+      font-size: var(--font-md);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
     }
 
     .active-signal-type {
-      font-size: 20px;
+      font-size: var(--font-2xl);
       font-weight: bold;
-      margin: 8px 0;
+      margin-bottom: var(--spacing-md);
     }
 
     .active-signal-details {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-      font-size: 13px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-sm);
     }
 
     .detail-item {
       background: rgba(255, 255, 255, 0.15);
       padding: 6px 10px;
-      border-radius: 6px;
+      border-radius: var(--radius-md);
     }
 
     .detail-label {
-      font-size: 10px;
+      font-size: var(--font-xs);
       opacity: 0.8;
       text-transform: uppercase;
     }
 
     .detail-value {
       font-weight: bold;
-      font-size: 14px;
+      font-size: var(--font-lg);
       margin-top: 2px;
     }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .stat-box {
-      background: #fafafa;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: center;
-      border: 1px solid #eee;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: #666;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 16px;
-      font-weight: bold;
-      color: #333;
-    }
-
+    /* Period Info */
     .period-info {
-      background: #f8f9fa;
+      background: #f0f7ff;
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      margin-top: var(--spacing-md);
+      font-size: var(--font-md);
+    }
+
+    /* Loading */
+    .loading-overlay {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.9);
+      padding: 20px 40px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      text-align: center;
+    }
+
+    .loading-text {
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .kpi-box {
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+
+    .kpi-box--default {
+      background: rgba(65, 90, 119, 0.3);
+      border: 1px solid #415a77;
+    }
+
+    .kpi-box--success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+    }
+
+    .kpi-box--danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+    }
+
+    .kpi-label {
+      font-size: var(--font-xs);
+      color: #a0a0a0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-value {
+      font-size: var(--font-3xl);
+      font-weight: bold;
+      margin-top: var(--spacing-xs);
+    }
+
+    .kpi-value--small {
+      font-size: var(--font-xl);
+    }
+
+    .kpi-value--success {
+      color: #10b981;
+    }
+
+    .kpi-value--danger {
+      color: #ef4444;
+    }
+
+    .kpi-value--accent {
+      color: var(--color-accent);
+    }
+
+    .kpi-value--light {
+      color: #e0e1dd;
+    }
+
+    /* Voting Detail */
+    .voting-container {
+      display: none;
+      margin-top: var(--spacing-lg);
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      border: 2px solid var(--color-primary);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+    }
+
+    .voting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .voting-title {
+      margin: 0;
+      color: var(--color-text);
+      font-size: 15px;
+    }
+
+    .voting-close {
+      background: #ff5252;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: var(--font-lg);
+      line-height: 1;
+    }
+
+    .voting-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .vote-box {
       padding: 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #666;
-      margin-top: 12px;
-      border-left: 3px solid #667eea;
+      border-radius: var(--radius-lg);
+      text-align: center;
     }
 
-    /* Estilos para selectores */
-    select:focus {
-      outline: none;
-      border-color: #764ba2;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    .vote-box--default {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
     }
 
-    select:hover {
-      border-color: #764ba2;
+    .vote-box--long {
+      background: var(--color-success-light);
+      border: 1px solid #a5d6a7;
     }
 
-    .controls-card {
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+    .vote-box--short {
+      background: var(--color-danger-light);
+      border: 1px solid #ef9a9a;
     }
 
-    /* Estilo para el contenedor del gráfico */
-    #chartContainer {
-      background: #fff;
-      border-radius: 4px;
+    .vote-box--neutral {
+      background: #f5f5f5;
+      border: 1px solid var(--color-border);
     }
 
-    /* ========== ESTILOS PARA ANÁLISIS LLM ========== */
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .vote-label {
+      font-size: var(--font-sm);
+      text-transform: uppercase;
     }
 
-    #generateAnalysisBtn:hover {
+    .vote-value {
+      font-size: var(--font-2xl);
+      font-weight: bold;
+      margin-top: var(--spacing-xs);
+    }
+
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .strategy-card {
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      border: 2px solid;
+      transition: transform var(--transition-fast);
+    }
+
+    .strategy-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
     }
 
-    #generateAnalysisBtn:active {
-      transform: translateY(0);
+    .voting-info {
+      margin-top: var(--spacing-lg);
+      padding: 10px;
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-md);
+      color: #555;
     }
 
-    #generateAnalysisBtn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
+    /* Analysis Section */
+    .analysis-container {
+      margin-top: var(--spacing-lg);
+      background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-secondary) 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      border: 2px solid var(--color-dark-border);
+      box-shadow: 0 4px 20px rgba(15, 52, 96, 0.3);
     }
 
-    .accordion-header:hover {
-      filter: brightness(1.1);
+    .analysis-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
     }
 
-    #analysisAccordionContent::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #analysisAccordionContent::-webkit-scrollbar-track {
-      background: rgba(15, 52, 96, 0.3);
-      border-radius: 4px;
-    }
-
-    #analysisAccordionContent::-webkit-scrollbar-thumb {
-      background: #e94560;
-      border-radius: 4px;
-    }
-
-    #analysisAccordionContent::-webkit-scrollbar-thumb:hover {
-      background: #ff6b6b;
-    }
-
-    /* Estilos para el texto del análisis */
-    #analysisText h1, #analysisText h2, #analysisText h3 {
+    .analysis-title {
+      margin: 0;
       color: #e94560;
-      margin-top: 16px;
-      margin-bottom: 8px;
+      font-size: var(--font-xl);
     }
 
-    #analysisText strong {
+    .analysis-info {
+      background: rgba(233, 69, 96, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      margin-bottom: var(--spacing-md);
+      border-left: 3px solid #e94560;
+    }
+
+    .analysis-loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .spinner-ring {
+      position: absolute;
+      border: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .spinner-ring--outer {
+      width: 60px;
+      height: 60px;
+      border-top-color: #e94560;
+    }
+
+    .spinner-ring--middle {
+      width: 45px;
+      height: 45px;
+      top: 7.5px;
+      left: 7.5px;
+      border-top-color: #0f3460;
+      animation-direction: reverse;
+      animation-duration: 1.5s;
+    }
+
+    .spinner-ring--inner {
+      width: 30px;
+      height: 30px;
+      top: 15px;
+      left: 15px;
+      border-top-color: #533483;
+      animation-duration: 2s;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .analysis-content {
+      display: none;
+    }
+
+    .analysis-summary {
+      background: rgba(15, 52, 96, 0.5);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .analysis-stat {
+      text-align: center;
+    }
+
+    .analysis-stat-label {
+      font-size: var(--font-sm);
+      color: #a0a0a0;
+      text-transform: uppercase;
+    }
+
+    .analysis-stat-value {
+      font-size: var(--font-4xl);
+      font-weight: bold;
+      color: #e94560;
+    }
+
+    .accordion {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--transition-normal);
+    }
+
+    .accordion-header span {
+      color: white;
+      font-weight: bold;
+      font-size: var(--font-lg);
+    }
+
+    .accordion-icon {
+      color: white;
+      font-size: var(--font-2xl);
+      transition: transform var(--transition-normal);
+    }
+
+    .accordion-content {
+      display: none;
+      background: rgba(26, 26, 46, 0.8);
+      padding: var(--spacing-lg);
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .analysis-text {
+      color: #e0e0e0;
+      font-size: var(--font-base);
+      line-height: 1.8;
+      white-space: pre-wrap;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .analysis-text h1, 
+    .analysis-text h2, 
+    .analysis-text h3 {
+      color: #e94560;
+      margin-top: var(--spacing-lg);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .analysis-text strong {
       color: #4fc3f7;
     }
 
-    #analysisText em {
+    .analysis-text em {
       color: #81c784;
     }
 
-    #analysisText code {
+    .analysis-text code {
       background: rgba(233, 69, 96, 0.2);
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       font-family: 'Consolas', monospace;
     }
-    /* ========== FIN ESTILOS ANÁLISIS LLM ========== */
 
+    .analysis-empty {
+      text-align: center;
+      padding: var(--spacing-xl);
+      color: #a0a0a0;
+    }
+
+    .analysis-error {
+      display: none;
+      background: rgba(244, 67, 54, 0.1);
+      border: 1px solid #f44336;
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .analysis-error p {
+      margin: 0;
+      color: #f44336;
+      font-size: var(--font-md);
+    }
+
+    /* Backtest Section */
+    .backtest-container {
+      margin-top: var(--spacing-lg);
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      border: 2px solid #415a77;
+      box-shadow: 0 4px 20px rgba(65, 90, 119, 0.3);
+    }
+
+    .backtest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .backtest-title {
+      margin: 0;
+      color: var(--color-accent);
+      font-size: var(--font-xl);
+    }
+
+    .backtest-info {
+      background: rgba(0, 180, 216, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      margin-bottom: var(--spacing-md);
+      border-left: 3px solid var(--color-accent);
+    }
+
+    .backtest-loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .backtest-content {
+      display: none;
+    }
+
+    .backtest-capital {
+      background: rgba(27, 38, 59, 0.8);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .backtest-capital-label {
+      font-size: var(--font-base);
+      font-weight: bold;
+      color: #e0e1dd;
+    }
+
+    .backtest-capital-value {
+      font-size: var(--font-base);
+      color: #778da9;
+    }
+
+    .bt-accordion-header {
+      background: linear-gradient(135deg, #415a77 0%, #1b263b 100%);
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--transition-normal);
+    }
+
+    .bt-accordion-header span {
+      color: white;
+      font-weight: bold;
+      font-size: var(--font-base);
+    }
+
+    .trades-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-md);
+    }
+
+    .trades-table thead {
+      background: rgba(65, 90, 119, 0.5);
+      position: sticky;
+      top: 0;
+    }
+
+    .trades-table th {
+      padding: 10px 8px;
+      text-align: left;
+      color: #778da9;
+      font-weight: 600;
+    }
+
+    .trades-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(65, 90, 119, 0.3);
+    }
+
+    .trades-content {
+      display: none;
+      background: rgba(13, 27, 42, 0.9);
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .backtest-empty {
+      text-align: center;
+      padding: var(--spacing-xl);
+      color: #a0a0a0;
+    }
+
+    .backtest-error {
+      display: none;
+      background: rgba(244, 67, 54, 0.1);
+      border: 1px solid #f44336;
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: var(--font-xs);
+      font-weight: bold;
+    }
+
+    .badge--primary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .badge--success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .badge--danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .trade-side {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: bold;
+      font-size: var(--font-sm);
+    }
+
+    .trade-side--long {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .trade-side--short {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    /* Chart */
+    .chart-container {
+      width: 100%;
+      height: 380px;
+      position: relative;
+    }
+
+    .chart-help {
+      margin-top: var(--spacing-sm);
+      font-size: var(--font-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* Refresh Indicator */
+    .refresh-indicator {
+      float: right;
+      font-size: var(--font-base);
+      font-weight: normal;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
       .grid {
         grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .control-group {
+        width: 100%;
+      }
+
+      .kpi-grid,
+      .voting-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .active-signal-details {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
   </style>
 </head>
 
 <body>
-  <h2>📊 MVP Trading — Paper Trading Dashboard <small style="color: #999; font-size: 14px;">(v4.1 - CON ANÁLISIS LLM)</small>
-    <span id="refresh-indicator" style="float: right; font-size: 13px; font-weight: normal; color: #667eea; background: #e8f0fe; padding: 4px 12px; border-radius: 20px;">🔄 Auto-refresh en 60s</span>
+  <h2 class="title">
+    TFM Trading Dashboard
+    <small class="text-muted">(Universidad Internacional de la Rioja (UNIR))</small>
+    <span id="refresh-indicator" class="refresh-indicator">Auto-refresh: 60s</span>
   </h2>
-  <p class="muted">Esto es únicamente con fines educativos y no constituye asesoría financiera.</p>
+  <p class="subtitle">Herramienta educativa. No constituye asesoría financiera.</p>
 
-  <!-- Panel de Controles -->
-  <div class="card" style="margin-bottom: 16px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
-    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
-      <!-- Selector de Ticker -->
-      <div style="flex: 1; min-width: 180px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;">
-          📈 Ticker / Símbolo
-        </label>
-        <select id="tickerSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+  <div class="card card--gradient" style="margin-bottom: var(--spacing-lg);">
+    <div class="controls">
+      <div class="control-group control-group--wide">
+        <label class="label">Ticker</label>
+        <select id="tickerSelect" class="select">
           <option value="AAPL">AAPL - Apple Inc.</option>
           <option value="MSFT">MSFT - Microsoft</option>
           <option value="GOOGL">GOOGL - Alphabet</option>
@@ -404,39 +1033,32 @@
           <option value="JPM">JPM - JPMorgan Chase</option>
           <option value="V">V - Visa Inc.</option>
           <option value="JNJ">JNJ - Johnson & Johnson</option>
-          <option value="EURUSD=X">EUR/USD - Euro/Dólar</option>
-          <option value="GBPUSD=X">GBP/USD - Libra/Dólar</option>
-          <option value="USDJPY=X">USD/JPY - Dólar/Yen</option>
-          <option value="BTC-USD">BTC/USD - Bitcoin</option>
-          <option value="ETH-USD">ETH/USD - Ethereum</option>
+          <option value="EURUSD=X">EUR/USD</option>
+          <option value="GBPUSD=X">GBP/USD</option>
+          <option value="USDJPY=X">USD/JPY</option>
+          <option value="BTC-USD">BTC/USD</option>
+          <option value="ETH-USD">ETH/USD</option>
           <option value="SPY">SPY - S&P 500 ETF</option>
           <option value="QQQ">QQQ - NASDAQ 100 ETF</option>
         </select>
       </div>
 
-      <!-- Selector de Rango de Tiempo -->
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;">
-          📅 Rango Histórico
-        </label>
-        <select id="rangeSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+      <div class="control-group">
+        <label class="label">Rango Temporal</label>
+        <select id="rangeSelect" class="select">
           <option value="0.02">1 Semana</option>
-          <option value="0.08" selected>1 Mes</option>
+          <option value="0.08">1 Mes</option>
           <option value="0.25">3 Meses</option>
-          <option value="0.5">6 Meses</option>
+          <option value="0.5" selected>6 Meses</option>
           <option value="1">1 Año</option>
           <option value="2">2 Años</option>
           <option value="5">5 Años</option>
-          <option value="10">10 Años</option>
         </select>
       </div>
 
-      <!-- Selector de Intervalo de Velas -->
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px;">
-          🕐 Intervalo de Velas
-        </label>
-        <select id="intervalSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+      <div class="control-group">
+        <label class="label">Intervalo</label>
+        <select id="intervalSelect" class="select">
           <option value="1m">1 Minuto</option>
           <option value="5m" selected>5 Minutos</option>
           <option value="15m">15 Minutos</option>
@@ -446,294 +1068,241 @@
         </select>
       </div>
 
-      <!-- Botón de Actualizar -->
-      <div style="min-width: 150px;">
-        <button id="loadDataBtn" style="width: 100%; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); transition: transform 0.2s, box-shadow 0.2s;">
-          🔄 Cargar Datos
-        </button>
+      <div class="control-group">
+        <button id="loadDataBtn" class="btn btn--primary btn--full">Cargar Datos</button>
       </div>
     </div>
-    <p style="margin: 10px 0 0 0; font-size: 11px; color: #666;">
-      ⚠️ <strong>Nota:</strong> Intervalos de 1m y 5m están limitados a datos recientes (máx 7-60 días). Para mayor histórico, usa intervalos de 1h, 1d o 1mo.
+    <p class="text-muted text-sm" style="margin: 10px 0 0 0;">
+      Intervalos de 1m y 5m limitados a datos recientes (máx 7-60 días).
     </p>
   </div>
 
   <div class="grid">
     <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="margin: 0;">Gráfico de Precios con Señales - <span id="currentTicker">AAPL</span></h3>
-        <button id="resetZoom"
-          style="padding: 6px 12px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-          🔍 Resetear Zoom
-        </button>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
+        <h3 class="title" style="margin: 0;">Precio con Señales - <span id="currentTicker">AAPL</span></h3>
+        <button id="resetZoom" class="btn btn--primary btn--small">Resetear Zoom</button>
       </div>
-      <div id="loadingOverlay" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.9); padding: 20px 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 100;">
-        <div style="text-align: center;">
-          <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
-          <div style="font-weight: 600;">Cargando datos...</div>
-        </div>
+      
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-text">Cargando datos...</div>
       </div>
-      <!-- Contenedor del gráfico -->
-      <div id="chartContainer" style="width: 100%; height: 380px; position: relative;">
+      
+      <div id="chartContainer" class="chart-container">
         <canvas id="priceChart"></canvas>
       </div>
-      <p id="chartNavHelp" class="muted" style="margin-top: 8px; font-size: 11px;">
-        💡 <strong>Controles:</strong> Rueda del mouse para zoom | Arrastrar para pan | "Resetear Zoom" para vista original
+      <p id="chartNavHelp" class="chart-help">
+        Rueda del mouse para zoom | Arrastrar para pan | "Resetear Zoom" para vista original
       </p>
-      
-      <!-- Contenedor de Detalle de Votación de Estrategias -->
-      <div id="votingDetailContainer" style="display: none; margin-top: 16px; background: linear-gradient(135deg, #f8f9ff 0%, #e8f4ff 100%); border-radius: 12px; padding: 16px; border: 2px solid #667eea; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h4 style="margin: 0; color: #333; font-size: 15px;">
-            🗳️ <span id="votingTitle">Detalle de Votación - Sistema de Estrategias</span>
-          </h4>
-          <button id="closeVotingDetail" onclick="document.getElementById('votingDetailContainer').style.display='none';" 
-                  style="background: #ff5252; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1;">✕</button>
+
+      <!-- Voting Detail Container -->
+      <div id="votingDetailContainer" class="voting-container">
+        <div class="voting-header">
+          <h4 id="votingTitle" class="voting-title">Detalle de Votación</h4>
+          <button id="closeVotingDetail" class="voting-close" onclick="TradingApp.ui.hideVotingDetail()">×</button>
         </div>
         
-        <!-- Resumen de votación -->
-        <div id="votingSummary" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
-          <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ddd;">
-            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Señal Final</div>
-            <div id="votingFinalSignal" style="font-size: 18px; font-weight: bold; margin-top: 4px;">—</div>
+        <div id="votingSummary" class="voting-summary">
+          <div class="vote-box vote-box--default">
+            <div class="vote-label">Señal Final</div>
+            <div id="votingFinalSignal" class="vote-value">—</div>
           </div>
-          <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #a5d6a7;">
-            <div style="font-size: 11px; color: #2e7d32; text-transform: uppercase;">Votos LONG</div>
-            <div id="votingLongCount" style="font-size: 18px; font-weight: bold; color: #2e7d32; margin-top: 4px;">0</div>
+          <div class="vote-box vote-box--long">
+            <div class="vote-label" style="color: var(--color-success);">Votos LONG</div>
+            <div id="votingLongCount" class="vote-value" style="color: var(--color-success);">0</div>
           </div>
-          <div style="background: #ffebee; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ef9a9a;">
-            <div style="font-size: 11px; color: #c62828; text-transform: uppercase;">Votos SHORT</div>
-            <div id="votingShortCount" style="font-size: 18px; font-weight: bold; color: #c62828; margin-top: 4px;">0</div>
+          <div class="vote-box vote-box--short">
+            <div class="vote-label" style="color: var(--color-danger);">Votos SHORT</div>
+            <div id="votingShortCount" class="vote-value" style="color: var(--color-danger);">0</div>
           </div>
-          <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #e0e0e0;">
-            <div style="font-size: 11px; color: #666; text-transform: uppercase;">Neutral</div>
-            <div id="votingNeutralCount" style="font-size: 18px; font-weight: bold; color: #757575; margin-top: 4px;">0</div>
+          <div class="vote-box vote-box--neutral">
+            <div class="vote-label">Neutral</div>
+            <div id="votingNeutralCount" class="vote-value" style="color: var(--color-neutral);">0</div>
           </div>
         </div>
         
-        <!-- Detalle por estrategia -->
-        <div id="strategyVotesGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-          <!-- Se llenará dinámicamente -->
-        </div>
+        <div id="strategyVotesGrid" class="strategy-grid"></div>
         
-        <!-- Información adicional -->
-        <div id="votingInfo" style="margin-top: 14px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 12px; color: #555;">
-          <strong>📊 Metodología:</strong> La señal final se determina por <em>votación mayoritaria</em>. Se requiere que al menos la mitad +1 de las estrategias coincidan para generar una señal. En caso de empate, se usa el <em>score promedio</em> como desempate.
+        <div id="votingInfo" class="voting-info">
+          La señal final se determina por votación mayoritaria. Se requiere que al menos la mitad +1 de las estrategias coincidan.
         </div>
       </div>
-      
-      <!-- ========== CONTENEDOR DE ANÁLISIS LLM ========== -->
-      <div id="llmAnalysisContainer" style="margin-top: 16px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 16px; border: 2px solid #0f3460; box-shadow: 0 4px 20px rgba(15, 52, 96, 0.3);">
-        
-        <!-- Header con botón -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h4 style="margin: 0; color: #e94560; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 20px;">🤖</span> Análisis Inteligente con IA
-          </h4>
-          <button id="generateAnalysisBtn" onclick="generateLLMAnalysis()" 
-                  style="background: linear-gradient(135deg, #e94560 0%, #0f3460 100%); color: white; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);">
-            <span id="analysisButtonIcon">✨</span>
+
+      <!-- LLM Analysis Container -->
+      <div id="llmAnalysisContainer" class="analysis-container">
+        <div class="analysis-header">
+          <h4 class="analysis-title">Análisis con IA</h4>
+          <button id="generateAnalysisBtn" onclick="TradingApp.analysis.generate()" class="btn btn--danger">
+            <span id="analysisButtonIcon">+</span>
             <span id="analysisButtonText">Generar Análisis</span>
           </button>
         </div>
         
-        <!-- Info del análisis -->
-        <div style="background: rgba(233, 69, 96, 0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 3px solid #e94560;">
-          <p style="margin: 0; font-size: 12px; color: #a0a0a0; line-height: 1.5;">
-            <strong style="color: #e94560;">¿Qué hace?</strong> Analiza todas las señales del período usando <strong>Google Gemini</strong> para explicar cada decisión de trading, las estrategias evaluadas y la gestión de riesgo.
+        <div class="analysis-info">
+          <p class="text-muted text-sm" style="margin: 0; line-height: 1.5;">
+            <strong style="color: #e94560;">Análisis:</strong> Usa Google Gemini para explicar cada señal, las estrategias evaluadas y la gestión de riesgo.
           </p>
         </div>
         
-        <!-- Indicador de carga -->
-        <div id="analysisLoadingIndicator" style="display: none; text-align: center; padding: 40px 20px;">
-          <div style="display: inline-block; position: relative; width: 80px; height: 80px;">
-            <div style="position: absolute; width: 60px; height: 60px; border: 4px solid transparent; border-top-color: #e94560; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <div style="position: absolute; width: 45px; height: 45px; top: 7.5px; left: 7.5px; border: 4px solid transparent; border-top-color: #0f3460; border-radius: 50%; animation: spin 1.5s linear infinite reverse;"></div>
-            <div style="position: absolute; width: 30px; height: 30px; top: 15px; left: 15px; border: 4px solid transparent; border-top-color: #533483; border-radius: 50%; animation: spin 2s linear infinite;"></div>
+        <div id="analysisLoadingIndicator" class="analysis-loading">
+          <div class="spinner">
+            <div class="spinner-ring spinner-ring--outer"></div>
+            <div class="spinner-ring spinner-ring--middle"></div>
+            <div class="spinner-ring spinner-ring--inner"></div>
           </div>
-          <p style="margin-top: 16px; color: #e94560; font-weight: bold; font-size: 14px;">🧠 Analizando señales con IA...</p>
-          <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 12px;">Esto puede tomar unos segundos</p>
+          <p style="margin-top: var(--spacing-lg); color: #e94560; font-weight: bold;">Analizando señales...</p>
+          <p class="text-muted text-sm">Esto puede tomar unos segundos</p>
         </div>
         
-        <!-- Contenido del análisis (acordeón) -->
-        <div id="analysisContent" style="display: none;">
-          <!-- Resumen rápido -->
-          <div id="analysisSummary" style="background: rgba(15, 52, 96, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div style="text-align: center;">
-              <div style="font-size: 11px; color: #a0a0a0; text-transform: uppercase;">Señales Analizadas</div>
-              <div id="analysisSignalCount" style="font-size: 24px; font-weight: bold; color: #e94560;">0</div>
+        <div id="analysisContent" class="analysis-content">
+          <div id="analysisSummary" class="analysis-summary">
+            <div class="analysis-stat">
+              <div class="analysis-stat-label">Señales Analizadas</div>
+              <div id="analysisSignalCount" class="analysis-stat-value">0</div>
             </div>
-            <div style="text-align: center;">
-              <div style="font-size: 11px; color: #a0a0a0; text-transform: uppercase;">Fuente</div>
-              <div id="analysisSource" style="font-size: 14px; font-weight: bold; color: #0f3460; margin-top: 4px;">
-                <span style="background: linear-gradient(135deg, #4285f4, #34a853); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Google Gemini</span>
-              </div>
+            <div class="analysis-stat">
+              <div class="analysis-stat-label">Fuente</div>
+              <div style="font-size: var(--font-xl); font-weight: bold; color: #4fc3f7; margin-top: var(--spacing-xs);">Google Gemini</div>
             </div>
-            <div style="text-align: center;">
-              <div style="font-size: 11px; color: #a0a0a0; text-transform: uppercase;">Caché</div>
-              <div id="analysisCacheStatus" style="font-size: 14px; font-weight: bold; margin-top: 4px;">—</div>
+            <div class="analysis-stat">
+              <div class="analysis-stat-label">Estado</div>
+              <div id="analysisCacheStatus" style="font-size: var(--font-xl); font-weight: bold; color: #81c784; margin-top: var(--spacing-xs);">—</div>
             </div>
           </div>
           
-          <!-- Acordeón con el análisis completo -->
-          <div id="analysisAccordion" style="border-radius: 8px; overflow: hidden;">
-            <div class="accordion-header" onclick="toggleAnalysisAccordion()" style="background: linear-gradient(135deg, #0f3460 0%, #533483 100%); padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;">
-              <span style="color: white; font-weight: bold; font-size: 14px;">📋 Ver Análisis Detallado</span>
-              <span id="accordionIcon" style="color: white; font-size: 18px; transition: transform 0.3s ease;">▼</span>
+          <div class="accordion">
+            <div class="accordion-header" onclick="TradingApp.ui.toggleAccordion('analysis')">
+              <span>Ver Análisis Detallado</span>
+              <span id="accordionIcon" class="accordion-icon">▼</span>
             </div>
-            <div id="analysisAccordionContent" style="display: none; background: rgba(26, 26, 46, 0.8); padding: 16px; max-height: 500px; overflow-y: auto;">
-              <div id="analysisText" style="color: #e0e0e0; font-size: 13px; line-height: 1.8; white-space: pre-wrap; font-family: 'Segoe UI', system-ui, sans-serif;"></div>
+            <div id="analysisAccordionContent" class="accordion-content">
+              <div id="analysisText" class="analysis-text"></div>
             </div>
           </div>
           
-          <!-- Error si existe -->
-          <div id="analysisError" style="display: none; background: rgba(244, 67, 54, 0.1); border: 1px solid #f44336; border-radius: 8px; padding: 12px; margin-top: 12px;">
-            <p style="margin: 0; color: #f44336; font-size: 12px;">
-              <strong>⚠️ Aviso:</strong> <span id="analysisErrorText"></span>
-            </p>
+          <div id="analysisError" class="analysis-error">
+            <p><strong>Aviso:</strong> <span id="analysisErrorText"></span></p>
           </div>
         </div>
         
-        <!-- Estado vacío inicial -->
-        <div id="analysisEmpty" style="text-align: center; padding: 20px; color: #a0a0a0;">
-          <p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada de las señales.</p>
+        <div id="analysisEmpty" class="analysis-empty">
+          <p style="margin: 0; font-size: var(--font-base);">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada.</p>
         </div>
       </div>
-      <!-- ========== FIN CONTENEDOR DE ANÁLISIS LLM ========== -->
-      
-      <!-- ========== CONTENEDOR DE BACKTEST ========== -->
-      <div id="backtestContainer" style="margin-top: 16px; background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%); border-radius: 12px; padding: 16px; border: 2px solid #415a77; box-shadow: 0 4px 20px rgba(65, 90, 119, 0.3);">
-        
-        <!-- Header con botón -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h4 style="margin: 0; color: #00b4d8; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 20px;">💰</span> Backtest - Resultados de Trading
-          </h4>
-          <button id="runBacktestBtn" onclick="runBacktest()" 
-                  style="background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);">
-            <span id="backtestButtonIcon">📊</span>
+
+      <!-- Backtest Container -->
+      <div id="backtestContainer" class="backtest-container">
+        <div class="backtest-header">
+          <h4 class="backtest-title">Backtest - Resultados</h4>
+          <button id="runBacktestBtn" onclick="TradingApp.backtest.run()" class="btn btn--accent">
+            <span id="backtestButtonIcon">▶</span>
             <span id="backtestButtonText">Ejecutar Backtest</span>
           </button>
         </div>
         
-        <!-- Info del backtest -->
-        <div style="background: rgba(0, 180, 216, 0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 3px solid #00b4d8;">
-          <p style="margin: 0; font-size: 12px; color: #a0a0a0; line-height: 1.5;">
-            <strong style="color: #00b4d8;">¿Qué hace?</strong> Simula la ejecución de todas las señales generadas en el período seleccionado, calculando el rendimiento histórico con gestión de riesgo real.
+        <div class="backtest-info">
+          <p class="text-muted text-sm" style="margin: 0; line-height: 1.5;">
+            <strong style="color: var(--color-accent);">Función:</strong> Simula la ejecución de todas las señales del período, calculando el rendimiento con gestión de riesgo.
           </p>
         </div>
         
-        <!-- Indicador de carga -->
-        <div id="backtestLoadingIndicator" style="display: none; text-align: center; padding: 40px 20px;">
-          <div style="display: inline-block; position: relative; width: 80px; height: 80px;">
-            <div style="position: absolute; width: 60px; height: 60px; border: 4px solid transparent; border-top-color: #00b4d8; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <div style="position: absolute; width: 45px; height: 45px; top: 7.5px; left: 7.5px; border: 4px solid transparent; border-top-color: #0077b6; border-radius: 50%; animation: spin 1.5s linear infinite reverse;"></div>
-            <div style="position: absolute; width: 30px; height: 30px; top: 15px; left: 15px; border: 4px solid transparent; border-top-color: #90e0ef; border-radius: 50%; animation: spin 2s linear infinite;"></div>
+        <div id="backtestLoadingIndicator" class="backtest-loading">
+          <div class="spinner">
+            <div class="spinner-ring spinner-ring--outer" style="border-top-color: var(--color-accent);"></div>
+            <div class="spinner-ring spinner-ring--middle" style="border-top-color: #415a77;"></div>
+            <div class="spinner-ring spinner-ring--inner" style="border-top-color: #1b263b;"></div>
           </div>
-          <p style="margin-top: 16px; color: #00b4d8; font-weight: bold; font-size: 14px;">📈 Ejecutando backtest...</p>
-          <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 12px;">Simulando trades históricos</p>
+          <p style="margin-top: var(--spacing-lg); color: var(--color-accent); font-weight: bold;">Ejecutando backtest...</p>
         </div>
         
-        <!-- Contenido del backtest -->
-        <div id="backtestContent" style="display: none;">
-          
-          <!-- KPIs Grid -->
-          <div id="backtestKPIs" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
-            <div style="background: rgba(0, 180, 216, 0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #415a77;">
-              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">Trades</div>
-              <div id="btTotalTrades" style="font-size: 22px; font-weight: bold; color: #00b4d8; margin-top: 4px;">0</div>
+        <div id="backtestContent" class="backtest-content">
+          <div class="kpi-grid">
+            <div class="kpi-box kpi-box--default">
+              <div class="kpi-label">Trades</div>
+              <div id="btTotalTrades" class="kpi-value kpi-value--accent">0</div>
             </div>
-            <div style="background: rgba(16, 185, 129, 0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #10b981;">
-              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">Win Rate</div>
-              <div id="btWinRate" style="font-size: 22px; font-weight: bold; color: #10b981; margin-top: 4px;">0%</div>
+            <div class="kpi-box kpi-box--success">
+              <div class="kpi-label">Win Rate</div>
+              <div id="btWinRate" class="kpi-value kpi-value--success">0%</div>
             </div>
-            <div style="padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #415a77;" id="btPnlBox">
-              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">PnL Total</div>
-              <div id="btTotalPnl" style="font-size: 22px; font-weight: bold; margin-top: 4px;">$0</div>
+            <div id="btPnlBox" class="kpi-box kpi-box--default">
+              <div class="kpi-label">PnL Total</div>
+              <div id="btTotalPnl" class="kpi-value">$0</div>
             </div>
-            <div style="background: rgba(239, 68, 68, 0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #ef4444;">
-              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">Max DD</div>
-              <div id="btMaxDD" style="font-size: 22px; font-weight: bold; color: #ef4444; margin-top: 4px;">0%</div>
+            <div class="kpi-box kpi-box--danger">
+              <div class="kpi-label">Max DD</div>
+              <div id="btMaxDD" class="kpi-value kpi-value--danger">0%</div>
             </div>
           </div>
           
-          <!-- Segunda fila de KPIs -->
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
-            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
-              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Sharpe</div>
-              <div id="btSharpe" style="font-size: 16px; font-weight: bold; color: #e0e1dd; margin-top: 2px;">0.00</div>
+          <div class="kpi-grid">
+            <div class="kpi-box kpi-box--default">
+              <div class="kpi-label">Sharpe</div>
+              <div id="btSharpe" class="kpi-value kpi-value--small kpi-value--light">0.00</div>
             </div>
-            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
-              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Profit Factor</div>
-              <div id="btProfitFactor" style="font-size: 16px; font-weight: bold; color: #e0e1dd; margin-top: 2px;">0.00</div>
+            <div class="kpi-box kpi-box--default">
+              <div class="kpi-label">Profit Factor</div>
+              <div id="btProfitFactor" class="kpi-value kpi-value--small kpi-value--light">0.00</div>
             </div>
-            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
-              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Mejor Trade</div>
-              <div id="btBestTrade" style="font-size: 16px; font-weight: bold; color: #10b981; margin-top: 2px;">$0</div>
+            <div class="kpi-box kpi-box--default">
+              <div class="kpi-label">Mejor Trade</div>
+              <div id="btBestTrade" class="kpi-value kpi-value--small kpi-value--success">$0</div>
             </div>
-            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
-              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Peor Trade</div>
-              <div id="btWorstTrade" style="font-size: 16px; font-weight: bold; color: #ef4444; margin-top: 2px;">$0</div>
-            </div>
-          </div>
-          
-          <!-- Resumen Capital -->
-          <div style="background: rgba(27, 38, 59, 0.8); border-radius: 8px; padding: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: bold; color: #e0e1dd;">💵 Capital</span>
-            <div style="font-size: 13px; color: #778da9;">
-              <span id="btInitialCapital">$10,000</span> → <span id="btFinalEquity" style="font-weight: bold; color: #00b4d8;">$10,000</span>
+            <div class="kpi-box kpi-box--default">
+              <div class="kpi-label">Peor Trade</div>
+              <div id="btWorstTrade" class="kpi-value kpi-value--small kpi-value--danger">$0</div>
             </div>
           </div>
           
-          <!-- Acordeón de Trades -->
-          <div id="backtestTradesAccordion" style="border-radius: 8px; overflow: hidden;">
-            <div class="bt-accordion-header" onclick="toggleBacktestAccordion()" style="background: linear-gradient(135deg, #415a77 0%, #1b263b 100%); padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;">
-              <span style="color: white; font-weight: bold; font-size: 13px;">📋 Ver Detalle de Trades (<span id="btTradeCount">0</span>)</span>
-              <span id="btAccordionIcon" style="color: white; font-size: 16px; transition: transform 0.3s ease;">▼</span>
+          <div class="backtest-capital">
+            <span class="backtest-capital-label">Capital</span>
+            <div class="backtest-capital-value">
+              <span id="btInitialCapital">$10,000</span> → <span id="btFinalEquity" style="font-weight: bold; color: var(--color-accent);">$10,000</span>
             </div>
-            <div id="backtestTradesContent" style="display: none; background: rgba(13, 27, 42, 0.9); max-height: 400px; overflow-y: auto;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          </div>
+          
+          <div class="accordion" style="border-radius: var(--radius-lg); overflow: hidden;">
+            <div class="bt-accordion-header" onclick="TradingApp.ui.toggleAccordion('backtest')">
+              <span>Ver Detalle de Trades (<span id="btTradeCount">0</span>)</span>
+              <span id="btAccordionIcon" class="accordion-icon">▼</span>
+            </div>
+            <div id="backtestTradesContent" class="trades-content">
+              <table class="trades-table">
                 <thead>
-                  <tr style="background: rgba(65, 90, 119, 0.5); position: sticky; top: 0;">
-                    <th style="padding: 10px 8px; text-align: left; color: #778da9; font-weight: 600;">#</th>
-                    <th style="padding: 10px 8px; text-align: left; color: #778da9; font-weight: 600;">Fecha</th>
-                    <th style="padding: 10px 8px; text-align: left; color: #778da9; font-weight: 600;">Tipo</th>
-                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">Entrada</th>
-                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">Salida</th>
-                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">PnL</th>
-                    <th style="padding: 10px 8px; text-align: center; color: #778da9; font-weight: 600;">Razón</th>
-                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">Duración</th>
+                  <tr>
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th style="text-align: right;">Entrada</th>
+                    <th style="text-align: right;">Salida</th>
+                    <th style="text-align: right;">PnL</th>
+                    <th style="text-align: center;">Razón</th>
+                    <th style="text-align: right;">Duración</th>
                   </tr>
                 </thead>
-                <tbody id="btTradesTableBody">
-                  <!-- Se llena dinámicamente -->
-                </tbody>
+                <tbody id="btTradesTableBody"></tbody>
               </table>
             </div>
           </div>
           
-          <!-- Error si existe -->
-          <div id="backtestError" style="display: none; background: rgba(244, 67, 54, 0.1); border: 1px solid #f44336; border-radius: 8px; padding: 12px; margin-top: 12px;">
-            <p style="margin: 0; color: #f44336; font-size: 12px;">
-              <strong>⚠️ Error:</strong> <span id="backtestErrorText"></span>
+          <div id="backtestError" class="backtest-error">
+            <p style="margin: 0; color: #f44336; font-size: var(--font-md);">
+              <strong>Error:</strong> <span id="backtestErrorText"></span>
             </p>
           </div>
         </div>
         
-        <!-- Estado vacío inicial -->
-        <div id="backtestEmpty" style="text-align: center; padding: 20px; color: #a0a0a0;">
-          <p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #00b4d8;">"Ejecutar Backtest"</strong> para simular el rendimiento histórico de las señales.</p>
+        <div id="backtestEmpty" class="backtest-empty">
+          <p style="margin: 0; font-size: var(--font-base);">Presiona <strong style="color: var(--color-accent);">"Ejecutar Backtest"</strong> para simular el rendimiento histórico.</p>
         </div>
       </div>
-      <!-- ========== FIN CONTENEDOR DE BACKTEST ========== -->
-      
     </div>
+    
     <div class="card">
-      <h3>📊 Estado del Trading</h3>
+      <h3 class="title">Estado del Trading</h3>
       
-      <!-- Señal Activa -->
       <div id="activeSignalBox" class="active-signal-box" style="display: none;">
-        <h3>🎯 SEÑAL ACTIVA</h3>
+        <h3>SEÑAL ACTIVA</h3>
         <div class="active-signal-type" id="activeSignalType">—</div>
         <div class="active-signal-details">
           <div class="detail-item">
@@ -755,16 +1324,15 @@
         </div>
       </div>
 
-      <!-- Estadísticas de Señales -->
-      <h3 style="margin-bottom: 8px; margin-top: 16px;">📈 Estadísticas (<span id="signalsCount">0</span> señales)</h3>
+      <h3 class="title" style="margin-top: var(--spacing-lg);">Estadísticas (<span id="signalsCount">0</span> señales)</h3>
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-label">LONG (Compra)</div>
-          <div class="stat-value" style="color: #0a7f42;" id="longCount">—</div>
+          <div class="stat-value signal-long" id="longCount">—</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">SHORT (Venta)</div>
-          <div class="stat-value" style="color: #b00020;" id="shortCount">—</div>
+          <div class="stat-value signal-short" id="shortCount">—</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Precio Mín</div>
@@ -777,13 +1345,13 @@
       </div>
       
       <div class="period-info" id="periodInfo">
-        <strong>📅 Periodo:</strong> <span id="dateRange">—</span>
+        <strong>Periodo:</strong> <span id="dateRange">—</span>
       </div>
       
-      <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 16px;">
-        <h3 style="margin-bottom: 12px;">📋 Historial de Señales</h3>
+      <div style="margin-top: var(--spacing-xl); border-top: 1px solid var(--color-border-light); padding-top: var(--spacing-lg);">
+        <h3 class="title">Historial de Señales</h3>
         <div id="signalsContainer" class="signals-container">
-          <p class="muted" style="text-align: center; padding: 20px 0;">Cargando señales...</p>
+          <p class="text-muted" style="text-align: center; padding: var(--spacing-xl) 0;">Cargando señales...</p>
         </div>
       </div>
     </div>
@@ -794,1140 +1362,887 @@
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+  
   <script>
-    const API_BASE = "http://127.0.0.1:8000";
-    let currentChart = null;  // Para destruir el chart anterior
+    const TradingApp = {
+      config: {
+        API_BASE: 'http://127.0.0.1:8000',
+        MAX_CHART_BARS: 500,
+        AUTO_REFRESH_INTERVAL: 60000
+      },
 
-    async function fetchJSON(url, fallback) {
-      try {
-        const r = await fetch(url);
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return await r.json();
-      } catch (e) {
-        console.warn("Error fetching", url, e);
-        return fallback;
-      }
-    }
+      state: {
+        chart: null,
+        signals: [],
+        autoRefreshTimer: null,
+        countdownTimer: null,
+        secondsUntilRefresh: 60
+      },
 
-    async function loadMetrics() {
-      try {
-        const response = await fetch('/backtest_report.json');
-        if (response.ok) {
-          const data = await response.json();
-          return data;
-        }
-      } catch (e) {
-        console.warn("No backtest report found");
-      }
-      return { metrics: { CAGR: 0.04, Sharpe: 0.16, MaxDrawdown: -0.034 }, last_equity: 10000 };
-    }
-
-    function getSignalLabel(signal) {
-      if (signal === 1) return '<span class="signal-long">LONG ▲</span>';
-      if (signal === -1) return '<span class="signal-short">SHORT ▼</span>';
-      return '<span class="signal-neutral">—</span>';
-    }
-
-    function getSelectedParams() {
-      return {
-        ticker: document.getElementById('tickerSelect').value,
-        years: parseFloat(document.getElementById('rangeSelect').value),
-        interval: document.getElementById('intervalSelect').value
-      };
-    }
-
-    // Función para obtener el formato de fecha apropiado según el rango e intervalo
-    function getDateFormat(years, interval) {
-      // Para intervalos mensuales
-      if (interval === '1mo') {
-        if (years >= 5) {
-          return { format: { year: 'numeric' }, skipFactor: 12 };  // Solo año
-        } else if (years >= 2) {
-          return { format: { year: 'numeric', month: 'short' }, skipFactor: 6 };  // Año + mes
-        } else {
-          return { format: { year: '2-digit', month: 'short' }, skipFactor: 3 };  // Cada 3 meses
-        }
-      }
-      
-      // Para intervalos diarios
-      if (interval === '1d') {
-        if (years >= 5) {
-          return { format: { year: 'numeric' }, skipFactor: 365 };  // Solo año
-        } else if (years >= 2) {
-          return { format: { day: '2-digit', month: 'short', year: '2-digit' }, skipFactor: 90 };  // Día + mes + año cada 3 meses
-        } else if (years >= 1) {
-          return { format: { day: '2-digit', month: 'short', year: '2-digit' }, skipFactor: 30 };  // Cada mes con año
-        } else if (years >= 0.5) {
-          return { format: { day: '2-digit', month: 'short' }, skipFactor: 14 };  // Cada 2 semanas
-        } else {
-          return { format: { day: '2-digit', month: 'short' }, skipFactor: 7 };  // Cada semana
-        }
-      }
-      
-      // Para intervalos de hora
-      if (interval === '1h') {
-        if (years >= 1) {
-          return { format: { day: '2-digit', month: 'short', year: '2-digit' }, skipFactor: 168 };  // Cada semana con año
-        } else if (years >= 0.25) {
-          return { format: { day: '2-digit', month: 'short' }, skipFactor: 24 };  // Cada día
-        } else {
-          return { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: 12 };  // Cada 12h
-        }
-      }
-      
-      // Para intervalos de 15 minutos
-      if (interval === '15m') {
-        if (years >= 0.08) {
-          return { format: { month: 'short', day: '2-digit' }, skipFactor: 96 };  // Cada día
-        } else {
-          return { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: 16 };  // Cada 4h
-        }
-      }
-      
-      // Para intervalos de 5 minutos o 1 minuto
-      if (interval === '5m' || interval === '1m') {
-        if (years >= 0.02) {
-          return { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: interval === '1m' ? 60 : 24 };  // Cada hora o 2h
-        } else {
-          return { format: { hour: '2-digit', minute: '2-digit' }, skipFactor: interval === '1m' ? 30 : 12 };  // Cada 30m o 1h
-        }
-      }
-      
-      // Default
-      return { format: { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }, skipFactor: 10 };
-    }
-
-    function showLoading(show) {
-      const overlay = document.getElementById('loadingOverlay');
-      const chartCard = document.querySelector('.card');
-      if (overlay) {
-        overlay.style.display = show ? 'block' : 'none';
-      }
-      if (chartCard) {
-        chartCard.style.position = show ? 'relative' : '';
-      }
-    }
-
-    async function init() {
-      console.log("🔄 Iniciando carga del dashboard...");
-      
-      const params = getSelectedParams();
-      console.log("📊 Parámetros:", params);
-      
-      // Actualizar título con ticker actual
-      document.getElementById('currentTicker').innerText = params.ticker;
-      
-      showLoading(true);
-      
-      // Construir URL con parámetros
-      const url = `${API_BASE}/signals?ticker=${encodeURIComponent(params.ticker)}&years=${params.years}&interval=${params.interval}`;
-      console.log("🌐 Consultando:", url);
-      
-      // Cargar datos
-      const signals = await fetchJSON(url, []);
-      console.log("📊 Señales cargadas:", signals.length);
-      
-      showLoading(false);
-      
-      if (signals.length === 0) {
-        console.error("❌ No se recibieron señales de la API");
-        document.getElementById("signalsContainer").innerHTML = `
-          <div style="text-align: center; padding: 30px;">
-            <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
-            <p class="muted">No hay datos disponibles para <strong>${params.ticker}</strong></p>
-            <p class="muted" style="font-size: 11px;">Prueba con un rango de tiempo mayor o un intervalo diferente</p>
-          </div>
-        `;
-        return;
-      }
-      
-      console.log("📈 Primera señal:", signals[0]);
-      console.log("📉 Última señal:", signals[signals.length - 1]);
-      
-      const metrics = await loadMetrics();
-
-      // Cargar explicaciones
-      const explanations = await fetchJSON(`${API_BASE}/explanations`, { text: "Análisis de trading en progreso..." });
-
-      // Calcular estadísticas de señales
-      const signalsWithAction = signals.filter(s => s.signal !== 0);
-      const longSignalsData = signalsWithAction.filter(s => s.signal === 1);
-      const shortSignalsData = signalsWithAction.filter(s => s.signal === -1);
-      
-      // Actualizar estadísticas
-      document.getElementById("signalsCount").innerText = signalsWithAction.length;
-      document.getElementById("longCount").innerText = `${longSignalsData.length} (${((longSignalsData.length / signalsWithAction.length) * 100).toFixed(0)}%)`;
-      document.getElementById("shortCount").innerText = `${shortSignalsData.length} (${((shortSignalsData.length / signalsWithAction.length) * 100).toFixed(0)}%)`;
-      
-      // Calcular rango de precios
-      if (signalsWithAction.length > 0) {
-        const prices = signalsWithAction.map(s => s.price);
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        document.getElementById("minPrice").innerText = `$${minPrice.toFixed(2)}`;
-        document.getElementById("maxPrice").innerText = `$${maxPrice.toFixed(2)}`;
-        
-        // Calcular rango de fechas con año incluido
-        const firstSignal = new Date(signalsWithAction[0].timestamp);
-        const lastSignal = new Date(signalsWithAction[signalsWithAction.length - 1].timestamp);
-        
-        // Formato de fecha para el periodo según el intervalo
-        let periodDateFormat;
-        if (params.interval === '1mo') {
-          periodDateFormat = { month: 'short', year: 'numeric' };
-        } else if (params.interval === '1d' && params.years >= 1) {
-          periodDateFormat = { day: '2-digit', month: 'short', year: '2-digit' };
-        } else {
-          periodDateFormat = { day: '2-digit', month: 'short', year: '2-digit' };
-        }
-        
-        document.getElementById("dateRange").innerText = `${firstSignal.toLocaleDateString('es-ES', periodDateFormat)} - ${lastSignal.toLocaleDateString('es-ES', periodDateFormat)}`;
-        
-        // Mostrar señal activa (la más reciente)
-        const lastActiveSignal = signalsWithAction[signalsWithAction.length - 1];
-        const activeBox = document.getElementById("activeSignalBox");
-        activeBox.style.display = "block";
-        
-        const signalType = lastActiveSignal.signal === 1 ? "🟢 LONG (Compra)" : "🔴 SHORT (Venta)";
-        
-        // Fecha completa para la señal activa
-        const activeSignalDate = new Date(lastActiveSignal.timestamp);
-        let activeSignalFormat;
-        if (params.interval === '1mo') {
-          activeSignalFormat = { month: 'long', year: 'numeric' };
-        } else if (params.interval === '1d') {
-          activeSignalFormat = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-        } else {
-          activeSignalFormat = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-        }
-        const signalTime = activeSignalDate.toLocaleString('es-ES', activeSignalFormat);
-        
-        document.getElementById("activeSignalType").innerText = `${signalType} - ${signalTime}`;
-        document.getElementById("activePrice").innerText = `$${lastActiveSignal.price.toFixed(2)}`;
-        document.getElementById("activeSL").innerText = lastActiveSignal.sl ? `$${lastActiveSignal.sl.toFixed(2)}` : "N/A";
-        document.getElementById("activeTP").innerText = lastActiveSignal.tp ? `$${lastActiveSignal.tp.toFixed(2)}` : "N/A";
-        
-        // Calcular Risk/Reward
-        if (lastActiveSignal.sl && lastActiveSignal.tp) {
-          const risk = Math.abs(lastActiveSignal.price - lastActiveSignal.sl);
-          const reward = Math.abs(lastActiveSignal.tp - lastActiveSignal.price);
-          const rr = reward / risk;
-          document.getElementById("activeRR").innerText = `1:${rr.toFixed(2)}`;
-        } else {
-          document.getElementById("activeRR").innerText = "N/A";
-        }
-      }
-
-      // Renderizar señales en panel lateral (orden inverso: más recientes primero)
-      console.log("🎯 Señales activas recibidas:", signalsWithAction.length);
-      console.log("📊 Total de barras recibidas:", signals.length);
-      
-      const container = document.getElementById("signalsContainer");
-      container.innerHTML = "";
-      
-      if (signalsWithAction.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align: center; padding: 20px 0;">No hay señales activas</p>';
-      } else {
-        // Determinar formato de fecha según el intervalo seleccionado
-        const getSignalDateFormat = (interval, years) => {
-          if (interval === '1m' || interval === '5m' || interval === '15m') {
-            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-          } else if (interval === '1h') {
-            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-          } else if (interval === '1d') {
-            if (years >= 2) {
-              return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-            }
-            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-          } else if (interval === '1mo') {
-            return { month: 'long', year: 'numeric' };
-          }
-          return { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-        };
-        
-        const signalDateFormat = getSignalDateFormat(params.interval, params.years);
-        
-        // Mostrar señales en orden inverso (más recientes primero)
-        signalsWithAction.slice().reverse().forEach((s, index) => {
-          const signalType = s.signal === 1 ? "LONG" : "SHORT";
-          const signalClass = s.signal === 1 ? "signal-long" : "signal-short";
-          const signalIcon = s.signal === 1 ? "▲" : "▼";
-          const signalAction = s.signal === 1 ? "Compra" : "Venta";
-          
-          // Fecha completa de la señal
-          const signalDate = new Date(s.timestamp);
-          const fullDate = signalDate.toLocaleString('es-ES', signalDateFormat);
-          
-          // Fecha corta para el header
-          const shortDate = signalDate.toLocaleString('es-ES', {
-            day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit'
-          });
-          
-          // Verificar si tiene datos de votación
-          const hasVotingData = s.strategy_votes && s.strategy_votes.length > 0;
-          
-          const signalItem = document.createElement("div");
-          signalItem.className = "signal-item";
-          signalItem.dataset.index = index;
-          signalItem.dataset.timestamp = s.timestamp;
-          signalItem.style.cursor = hasVotingData ? "pointer" : "default";
-          
-          // Guardar datos de votación en el elemento
-          if (hasVotingData) {
-            signalItem.dataset.strategyVotes = JSON.stringify(s.strategy_votes);
-            signalItem.dataset.longVotes = s.long_votes || 0;
-            signalItem.dataset.shortVotes = s.short_votes || 0;
-            signalItem.dataset.neutralVotes = s.neutral_votes || 0;
-            signalItem.dataset.finalSignal = s.signal;
-            signalItem.dataset.price = s.price;
-            signalItem.dataset.score = s.score;
-          }
-          
-          const votingBadge = hasVotingData 
-            ? `<span style="background: #667eea; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 8px;">🗳️ ${s.long_votes || 0}L / ${s.short_votes || 0}S</span>`
-            : '';
-          
-          signalItem.innerHTML = `
-            <div class="signal-header">
-              <span class="signal-type ${signalClass}">${signalIcon} ${signalType} (${signalAction}) ${votingBadge}</span>
-              <span class="signal-time">${shortDate}</span>
-            </div>
-            <div class="signal-date" style="font-size: 11px; color: #667eea; margin-bottom: 4px; font-weight: 500;">
-              📅 ${fullDate}
-            </div>
-            <div class="signal-price">Precio: $${s.price.toFixed(2)}</div>
-            <div class="signal-details">
-              <strong>Confianza:</strong> ${(s.score * 100).toFixed(0)}% | 
-              <strong>SL:</strong> $${s.sl ? s.sl.toFixed(2) : "N/A"} | 
-              <strong>TP:</strong> $${s.tp ? s.tp.toFixed(2) : "N/A"}
-            </div>
-            ${hasVotingData ? '<div style="text-align: center; margin-top: 6px; font-size: 11px; color: #667eea;">👆 Clic para ver detalle de votación</div>' : ''}
-            <div class="signal-explanation">
-              <strong>🤖 Explicación IA:</strong><br>
-              ${explanations.text || "Análisis técnico basado en cruces de EMAs y confirmación de indicadores."}
-            </div>
-            <div style="text-align: right; margin-top: 4px;">
-              <span class="expand-icon">▼ Ver más</span>
-            </div>
-          `;
-          
-          // Evento de clic para mostrar detalle de votación
-          signalItem.addEventListener("click", function(e) {
-            if (hasVotingData) {
-              showVotingDetail(this);
-            }
-            // Toggle explicación
-            this.classList.toggle("expanded");
-            const icon = this.querySelector(".expand-icon");
-            icon.textContent = this.classList.contains("expanded") ? "▲ Ver menos" : "▼ Ver más";
-          });
-          
-          container.appendChild(signalItem);
-        });
-      }
-
-      // Preparar datos para gráfico de velas
-      console.log("🎨 Preparando gráfico...");
-      const ctx = document.getElementById("priceChart").getContext("2d");
-      
-      // Destruir chart anterior si existe
-      if (currentChart) {
-        currentChart.destroy();
-        currentChart = null;
-      }
-      
-      // Limitar datos para mejor visualización (máx 500 barras)
-      const maxBars = 500;
-      const chartData = signals.length > maxBars ? signals.slice(-maxBars) : signals;
-      console.log("📊 Barras para gráfico:", chartData.length);
-
-      // Crear datos de velas usando ÍNDICES para evitar gaps en el eje X
-      const candlestickData = chartData.map((s, i) => ({
-        x: i,  // Usar índice en lugar de timestamp
-        o: s.open,
-        h: s.high,
-        l: s.low,
-        c: s.close,
-        timestamp: s.timestamp  // Guardar timestamp para tooltips
-      }));
-
-      // Detectar señales para marcar en el gráfico
-      const longSignals = chartData.map((s, i) => ({
-        x: i,  // Usar índice
-        y: s.signal === 1 ? s.price : null,
-        timestamp: s.timestamp
-      })).filter(p => p.y !== null);
-
-      const shortSignals = chartData.map((s, i) => ({
-        x: i,  // Usar índice
-        y: s.signal === -1 ? s.price : null,
-        timestamp: s.timestamp
-      })).filter(p => p.y !== null);
-
-      console.log("✅ Datos preparados - Velas:", candlestickData.length, "| LONG:", longSignals.length, "| SHORT:", shortSignals.length);
-
-      // Obtener formato de fecha dinámico según rango e intervalo
-      const dateFormatConfig = getDateFormat(params.years, params.interval);
-      console.log("📅 Formato de fecha:", dateFormatConfig);
-
-      currentChart = new Chart(ctx, {
-        type: "candlestick",
-        data: {
-          datasets: [
-            {
-              label: signals.length > 0 ? "Precio" : "EUR/USD",  // Etiqueta genérica
-              data: candlestickData,
-              color: {
-                up: '#26a69a',
-                down: '#ef5350',
-                unchanged: '#999'
-              },
-              borderColor: {
-                up: '#26a69a',
-                down: '#ef5350',
-                unchanged: '#999'
-              }
-            },
-            {
-              type: 'scatter',
-              label: "LONG ▲",
-              data: longSignals,
-              borderColor: "#4CAF50",
-              backgroundColor: "#4CAF50",
-              pointRadius: 8,
-              pointStyle: 'triangle',
-              pointRotation: 0
-            },
-            {
-              type: 'scatter',
-              label: "SHORT ▼",
-              data: shortSignals,
-              borderColor: "#F44336",
-              backgroundColor: "#F44336",
-              pointRadius: 8,
-              pointStyle: 'triangle',
-              pointRotation: 180
-            }
-          ]
+      // Date formatting configuration based on interval and range
+      dateFormats: {
+        '1mo': {
+          5: { format: { year: 'numeric' }, skip: 12 },
+          2: { format: { year: 'numeric', month: 'short' }, skip: 6 },
+          default: { format: { year: '2-digit', month: 'short' }, skip: 3 }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,  // Permitir que el gráfico llene el contenedor
-          plugins: {
-            legend: {
-              display: true,
-              position: 'top'
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-              backgroundColor: 'rgba(0, 0, 0, 0.85)',
-              titleColor: '#fff',
-              bodyColor: '#fff',
-              borderColor: '#667eea',
-              borderWidth: 1,
-              padding: 12,
-              displayColors: true,
-              callbacks: {
-                title: function(context) {
-                  // Mostrar fecha completa en el tooltip
-                  const index = context[0].parsed.x;
-                  if (chartData[index]) {
-                    const date = new Date(chartData[index].timestamp);
-                    return date.toLocaleString('es-ES', {
-                      weekday: 'short',
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    });
-                  }
-                  return '';
-                },
-                label: function (context) {
-                  const datasetLabel = context.dataset.label || '';
-                  const index = context.parsed.x;
-                  
-                  // Para el dataset de velas (candlestick), mostrar OHLC
-                  if (datasetLabel === 'Precio' && chartData[index]) {
-                    const candle = chartData[index];
-                    return [
-                      `Apertura: $${candle.open.toFixed(2)}`,
-                      `Máximo: $${candle.high.toFixed(2)}`,
-                      `Mínimo: $${candle.low.toFixed(2)}`,
-                      `Cierre: $${candle.close.toFixed(2)}`
-                    ];
-                  }
-                  
-                  // Para señales LONG/SHORT
-                  if (context.parsed.y !== undefined && context.parsed.y !== null) {
-                    return `${datasetLabel}: $${context.parsed.y.toFixed(2)}`;
-                  }
-                  return null;
-                },
-                labelColor: function(context) {
-                  if (context.dataset.label === 'LONG ▲') {
-                    return { borderColor: '#4CAF50', backgroundColor: '#4CAF50' };
-                  } else if (context.dataset.label === 'SHORT ▼') {
-                    return { borderColor: '#F44336', backgroundColor: '#F44336' };
-                  }
-                  return { borderColor: '#667eea', backgroundColor: '#667eea' };
-                }
-              }
-            },
-            zoom: {
-              zoom: {
-                wheel: {
-                  enabled: true,
-                  speed: 0.1,
-                  modifierKey: null  // Permitir zoom sin tecla modificadora
-                },
-                pinch: {
-                  enabled: true
-                },
-                drag: {
-                  enabled: true,
-                  backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                  borderColor: 'rgba(33, 150, 243, 0.5)',
-                  borderWidth: 1
-                },
-                mode: 'xy'
-              },
-              pan: {
-                enabled: true,
-                mode: 'xy',
-                modifierKey: null  // Permitir pan sin necesidad de Ctrl
-              },
-              limits: {
-                x: { min: 'original', max: 'original' },
-                y: { min: 'original', max: 'original' }
-              }
-            }
-          },
-          scales: {
-            x: {
-              type: 'linear',
-              min: 0,  // Empezar desde el inicio de los datos
-              max: chartData.length - 1,  // Terminar en el último dato
-              ticks: {
-                maxRotation: 45,
-                minRotation: 0,
-                autoSkip: true,
-                autoSkipPadding: 15,
-                maxTicksLimit: 12,
-                callback: function(value, index) {
-                  // Solo mostrar etiquetas para valores enteros válidos
-                  if (!Number.isInteger(value) || value < 0 || value >= chartData.length) return '';
-                  
-                  // Calcular factor de salto dinámico basado en cantidad de datos
-                  const dynamicSkip = Math.max(1, Math.floor(chartData.length / 10));
-                  if (value % dynamicSkip !== 0 && value !== chartData.length - 1) return '';
-                  
-                  if (chartData[value]) {
-                    const date = new Date(chartData[value].timestamp);
-                    return date.toLocaleString('es-ES', dateFormatConfig.format);
-                  }
-                  return '';
-                },
-                font: {
-                  size: 10
-                }
-              },
-              grid: {
-                display: true,
-                color: 'rgba(0, 0, 0, 0.05)'
-              }
-            },
-            y: {
-              display: true,
-              position: 'right',
-              ticks: {
-                callback: function (value) {
-                  return value.toFixed(2);  // Ajustado para acciones
-                }
-              }
-            }
-          },
-          interaction: {
-            mode: 'nearest',
-            axis: 'x',
-            intersect: false
-          }
+        '1d': {
+          5: { format: { year: 'numeric' }, skip: 365 },
+          2: { format: { day: '2-digit', month: 'short', year: '2-digit' }, skip: 90 },
+          1: { format: { day: '2-digit', month: 'short', year: '2-digit' }, skip: 30 },
+          0.5: { format: { day: '2-digit', month: 'short' }, skip: 14 },
+          default: { format: { day: '2-digit', month: 'short' }, skip: 7 }
+        },
+        '1h': {
+          1: { format: { day: '2-digit', month: 'short', year: '2-digit' }, skip: 168 },
+          0.25: { format: { day: '2-digit', month: 'short' }, skip: 24 },
+          default: { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skip: 12 }
+        },
+        '15m': {
+          0.08: { format: { month: 'short', day: '2-digit' }, skip: 96 },
+          default: { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skip: 16 }
+        },
+        '5m': {
+          0.02: { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skip: 24 },
+          default: { format: { hour: '2-digit', minute: '2-digit' }, skip: 12 }
+        },
+        '1m': {
+          0.02: { format: { day: '2-digit', hour: '2-digit', minute: '2-digit' }, skip: 60 },
+          default: { format: { hour: '2-digit', minute: '2-digit' }, skip: 30 }
         }
-      });
+      },
 
-      // Botón para resetear zoom
-      document.getElementById('resetZoom').addEventListener('click', function () {
-        if (currentChart) {
-          currentChart.resetZoom();
-        }
-      });
-    }
+      strategyNames: {
+        'ema_crossover': 'EMA Crossover',
+        'rsi_reversal': 'RSI Reversal',
+        'macd_crossover': 'MACD Crossover',
+        'bollinger_breakout': 'Bollinger Breakout'
+      },
 
-    // Event listeners para los controles
-    document.getElementById('loadDataBtn').addEventListener('click', function() {
-      init();
-    });
-
-    // Agregar efecto hover al botón
-    const loadBtn = document.getElementById('loadDataBtn');
-    loadBtn.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-2px)';
-      this.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
-    });
-    loadBtn.addEventListener('mouseleave', function() {
-      this.style.transform = 'translateY(0)';
-      this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
-    });
-
-    // Actualizar automáticamente cuando cambia el intervalo (ajustar límites)
-    document.getElementById('intervalSelect').addEventListener('change', function() {
-      const interval = this.value;
-      const rangeSelect = document.getElementById('rangeSelect');
-      
-      // Mostrar advertencia si el intervalo tiene límites
-      if (interval === '1m') {
-        // Máx 7 días para 1m
-        if (parseFloat(rangeSelect.value) > 0.02) {
-          rangeSelect.value = '0.02';  // 1 semana
-        }
-      } else if (interval === '5m' || interval === '15m') {
-        // Máx 60 días
-        if (parseFloat(rangeSelect.value) > 0.17) {
-          rangeSelect.value = '0.08';  // 1 mes
-        }
-      }
-    });
-
-    // ==========================================
-    // FUNCIÓN PARA MOSTRAR DETALLE DE VOTACIÓN
-    // ==========================================
-    function showVotingDetail(signalElement) {
-      const container = document.getElementById('votingDetailContainer');
-      const strategyVotes = JSON.parse(signalElement.dataset.strategyVotes || '[]');
-      const longVotes = parseInt(signalElement.dataset.longVotes) || 0;
-      const shortVotes = parseInt(signalElement.dataset.shortVotes) || 0;
-      const neutralVotes = parseInt(signalElement.dataset.neutralVotes) || 0;
-      const finalSignal = parseInt(signalElement.dataset.finalSignal);
-      const price = parseFloat(signalElement.dataset.price);
-      const score = parseFloat(signalElement.dataset.score);
-      const timestamp = signalElement.dataset.timestamp;
-      
-      // Actualizar título con fecha
-      const signalDate = new Date(timestamp);
-      const dateStr = signalDate.toLocaleString('es-ES', {
-        weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
-      document.getElementById('votingTitle').innerHTML = 
-        `Detalle de Votación - <span style="color: #667eea;">${dateStr}</span> - Precio: <span style="color: #333;">$${price.toFixed(2)}</span>`;
-      
-      // Actualizar resumen
-      const finalSignalText = finalSignal === 1 ? '🟢 LONG' : finalSignal === -1 ? '🔴 SHORT' : '⚪ NEUTRAL';
-      const finalSignalColor = finalSignal === 1 ? '#2e7d32' : finalSignal === -1 ? '#c62828' : '#757575';
-      document.getElementById('votingFinalSignal').innerHTML = `<span style="color: ${finalSignalColor}">${finalSignalText}</span>`;
-      document.getElementById('votingLongCount').textContent = longVotes;
-      document.getElementById('votingShortCount').textContent = shortVotes;
-      document.getElementById('votingNeutralCount').textContent = neutralVotes;
-      
-      // Generar grid de estrategias
-      const strategyGrid = document.getElementById('strategyVotesGrid');
-      strategyGrid.innerHTML = '';
-      
-      // Nombres amigables para las estrategias
-      const strategyNames = {
-        'ema_crossover': '📈 EMA Crossover',
-        'rsi_reversal': '📊 RSI Reversal',
-        'macd_crossover': '📉 MACD Crossover',
-        'bollinger_breakout': '📐 Bollinger Breakout'
-      };
-      
-      // Descripciones cortas
-      const strategyDescriptions = {
+      strategyDescriptions: {
         'ema_crossover': 'Cruces de medias móviles exponenciales con filtros RSI/MACD',
         'rsi_reversal': 'Reversión desde zonas de sobrecompra/sobreventa',
         'macd_crossover': 'Cruces de MACD con confirmación de momentum',
         'bollinger_breakout': 'Ruptura de bandas de Bollinger con tendencia fuerte'
-      };
-      
-      strategyVotes.forEach(vote => {
-        const voteColor = vote.vote === 'LONG' ? '#2e7d32' : vote.vote === 'SHORT' ? '#c62828' : '#757575';
-        const voteBg = vote.vote === 'LONG' ? '#e8f5e9' : vote.vote === 'SHORT' ? '#ffebee' : '#f5f5f5';
-        const voteBorder = vote.vote === 'LONG' ? '#a5d6a7' : vote.vote === 'SHORT' ? '#ef9a9a' : '#e0e0e0';
-        const voteIcon = vote.vote === 'LONG' ? '🟢' : vote.vote === 'SHORT' ? '🔴' : '⚪';
-        const scorePercent = (vote.score * 100).toFixed(0);
-        
-        const strategyCard = document.createElement('div');
-        strategyCard.style.cssText = `
-          background: ${voteBg};
-          padding: 12px;
-          border-radius: 8px;
-          border: 2px solid ${voteBorder};
-          transition: transform 0.2s ease;
-        `;
-        strategyCard.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-weight: 600; font-size: 13px; color: #333;">${strategyNames[vote.name] || vote.name}</span>
-            <span style="font-size: 16px;">${voteIcon}</span>
-          </div>
-          <div style="font-size: 20px; font-weight: bold; color: ${voteColor}; margin-bottom: 4px;">
-            ${vote.vote}
-          </div>
-          <div style="font-size: 11px; color: #666; margin-bottom: 4px;">
-            Score: <strong>${scorePercent}%</strong>
-          </div>
-          <div style="font-size: 10px; color: #888; line-height: 1.3;">
-            ${strategyDescriptions[vote.name] || 'Estrategia de trading algorítmico'}
-          </div>
-        `;
-        
-        strategyGrid.appendChild(strategyCard);
-      });
-      
-      // Actualizar información adicional
-      const totalVotes = longVotes + shortVotes + neutralVotes;
-      const majority = Math.ceil(totalVotes / 2) + (totalVotes % 2 === 0 ? 1 : 0);
-      const winningVotes = finalSignal === 1 ? longVotes : finalSignal === -1 ? shortVotes : 0;
-      const votingInfo = document.getElementById('votingInfo');
-      votingInfo.innerHTML = `
-        <strong>📊 Metodología:</strong> La señal final se determina por <em>votación mayoritaria</em>. 
-        Se requiere al menos <strong>${majority}/${totalVotes}</strong> votos para generar una señal. 
-        ${finalSignal !== 0 ? `<br><strong>Resultado:</strong> ${winningVotes} de ${totalVotes} estrategias votaron ${finalSignal === 1 ? 'LONG' : 'SHORT'} (${((winningVotes/totalVotes)*100).toFixed(0)}% consenso).` : ''}
-        <br><strong>Score final:</strong> ${(score * 100).toFixed(0)}% (promedio de estrategias coincidentes).
-      `;
-      
-      // Mostrar contenedor
-      container.style.display = 'block';
-      
-      // Scroll suave al contenedor de votación
-      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+      },
 
-    // Cargar datos iniciales
-    init();
+      // API methods
+      api: {
+        async fetch(url, fallback = null) {
+          try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+          } catch (error) {
+            console.warn('API fetch error:', url, error);
+            return fallback;
+          }
+        },
 
-    // ==========================================
-    // AUTO-REFRESH: Actualización automática cada minuto
-    // ==========================================
-    let autoRefreshInterval = null;
-    let countdownInterval = null;
-    let secondsUntilRefresh = 60;
+        async getSignals(params) {
+          const url = `${TradingApp.config.API_BASE}/signals?ticker=${encodeURIComponent(params.ticker)}&years=${params.years}&interval=${params.interval}`;
+          return this.fetch(url, []);
+        },
 
-    function startAutoRefresh() {
-      // Actualizar cada 60 segundos (60000 ms)
-      autoRefreshInterval = setInterval(() => {
-        console.log('🔄 Auto-refresh: Actualizando datos...');
-        init();
-        secondsUntilRefresh = 60;
-      }, 60000);
+        async getExplanations() {
+          return this.fetch(`${TradingApp.config.API_BASE}/explanations`, { text: 'Análisis de trading en progreso...' });
+        },
 
-      // Contador regresivo visible
-      countdownInterval = setInterval(() => {
-        secondsUntilRefresh--;
-        if (secondsUntilRefresh < 0) secondsUntilRefresh = 60;
-        updateRefreshIndicator();
-      }, 1000);
+        async getBacktestReport() {
+          return this.fetch('/backtest_report.json', { metrics: { CAGR: 0.04, Sharpe: 0.16, MaxDrawdown: -0.034 }, last_equity: 10000 });
+        },
 
-      updateRefreshIndicator();
-    }
+        async postAnalysis(data) {
+          const response = await fetch(`${TradingApp.config.API_BASE}/analysis`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          return response.json();
+        },
 
-    function updateRefreshIndicator() {
-      const indicator = document.getElementById('refresh-indicator');
-      if (indicator) {
-        indicator.textContent = `🔄 Auto-refresh en ${secondsUntilRefresh}s`;
-      }
-    }
-
-    // Resetear contador cuando el usuario carga manualmente
-    loadDataBtn.addEventListener('click', () => {
-      secondsUntilRefresh = 60;
-    });
-
-    // Iniciar auto-refresh
-    startAutoRefresh();
-    console.log('✅ Auto-refresh activado: actualización cada 60 segundos');
-
-    // ==========================================
-    // ANÁLISIS LLM: Funciones para generar análisis con IA
-    // ==========================================
-    
-    // Variable global para almacenar las señales cargadas
-    let loadedSignals = [];
-    
-    // Guardar señales cuando se cargan
-    const originalInit = init;
-    init = async function() {
-      await originalInit();
-      // Guardar las señales cargadas para el análisis LLM
-      const params = getSelectedParams();
-      const url = `${API_BASE}/signals?ticker=${encodeURIComponent(params.ticker)}&years=${params.years}&interval=${params.interval}`;
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          loadedSignals = await response.json();
-          console.log('📊 Señales guardadas para análisis LLM:', loadedSignals.filter(s => s.signal !== 0).length);
+        async runBacktest(ticker, years, interval) {
+          const response = await fetch(
+            `${TradingApp.config.API_BASE}/backtest/${encodeURIComponent(ticker)}?years=${years}&interval=${interval}`
+          );
+          if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          return response.json();
         }
-      } catch (e) {
-        console.error('Error guardando señales para LLM:', e);
-      }
-    };
-    
-    async function generateLLMAnalysis() {
-      const btn = document.getElementById('generateAnalysisBtn');
-      const btnIcon = document.getElementById('analysisButtonIcon');
-      const btnText = document.getElementById('analysisButtonText');
-      const loadingIndicator = document.getElementById('analysisLoadingIndicator');
-      const analysisContent = document.getElementById('analysisContent');
-      const analysisEmpty = document.getElementById('analysisEmpty');
-      const analysisError = document.getElementById('analysisError');
-      
-      // Obtener parámetros actuales
-      const params = getSelectedParams();
-      
-      // Verificar si hay señales
-      const activeSignals = loadedSignals.filter(s => s.signal !== 0);
-      if (activeSignals.length === 0) {
-        alert('⚠️ No hay señales activas para analizar. Carga datos con señales primero.');
-        return;
-      }
-      
-      // Deshabilitar botón y mostrar loading
-      btn.disabled = true;
-      btnIcon.textContent = '⏳';
-      btnText.textContent = 'Analizando...';
-      loadingIndicator.style.display = 'block';
-      analysisContent.style.display = 'none';
-      analysisEmpty.style.display = 'none';
-      analysisError.style.display = 'none';
-      
-      console.log('🤖 Generando análisis LLM para', params.ticker, 'con', activeSignals.length, 'señales');
-      
-      try {
-        const response = await fetch(`${API_BASE}/analysis`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ticker: params.ticker,
-            signals: loadedSignals,
-            use_cache: true
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        console.log('✅ Análisis recibido:', result);
-        
-        // Mostrar resultados
-        document.getElementById('analysisSignalCount').textContent = result.signal_count;
-        document.getElementById('analysisCacheStatus').innerHTML = result.cached 
-          ? '<span style="color: #81c784;">✓ Desde caché</span>' 
-          : '<span style="color: #4fc3f7;">✓ Nuevo</span>';
-        
-        // Formatear y mostrar el texto del análisis
-        const formattedAnalysis = formatAnalysisText(result.analysis);
-        document.getElementById('analysisText').innerHTML = formattedAnalysis;
-        
-        // Mostrar error si existe
-        if (result.error) {
-          document.getElementById('analysisErrorText').textContent = result.error;
-          analysisError.style.display = 'block';
-        }
-        
-        // Mostrar contenido
-        loadingIndicator.style.display = 'none';
-        analysisContent.style.display = 'block';
-        
-        // Auto-expandir el acordeón
-        document.getElementById('analysisAccordionContent').style.display = 'block';
-        document.getElementById('accordionIcon').style.transform = 'rotate(180deg)';
-        
-      } catch (error) {
-        console.error('❌ Error en análisis LLM:', error);
-        loadingIndicator.style.display = 'none';
-        analysisEmpty.style.display = 'block';
-        analysisEmpty.innerHTML = `
-          <p style="margin: 0; font-size: 13px; color: #f44336;">
-            <strong>❌ Error:</strong> ${error.message}
-          </p>
-          <p style="margin: 8px 0 0 0; font-size: 12px; color: #a0a0a0;">
-            Verifica que la API esté corriendo y que Google Gemini esté configurado.
-          </p>
-        `;
-      } finally {
-        // Rehabilitar botón
-        btn.disabled = false;
-        btnIcon.textContent = '✨';
-        btnText.textContent = 'Generar Análisis';
-      }
-    }
-    
-    function toggleAnalysisAccordion() {
-      const content = document.getElementById('analysisAccordionContent');
-      const icon = document.getElementById('accordionIcon');
-      
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-        icon.style.transform = 'rotate(180deg)';
-      } else {
-        content.style.display = 'none';
-        icon.style.transform = 'rotate(0deg)';
-      }
-    }
-    
-    function formatAnalysisText(text) {
-      // Convertir markdown básico a HTML
-      let formatted = text
-        // Headers
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        // Bold
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Italic
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        // Code
-        .replace(/`(.*?)`/g, '<code>$1</code>')
-        // Line breaks
-        .replace(/\n/g, '<br>')
-        // Tags especiales del análisis
-        .replace(/&lt;analisis&gt;/g, '<div style="background: rgba(79, 195, 247, 0.1); border-left: 3px solid #4fc3f7; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #4fc3f7;">📊 Análisis:</strong><br>')
-        .replace(/&lt;\/analisis&gt;/g, '</div>')
-        .replace(/<analisis>/g, '<div style="background: rgba(79, 195, 247, 0.1); border-left: 3px solid #4fc3f7; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #4fc3f7;">📊 Análisis:</strong><br>')
-        .replace(/<\/analisis>/g, '</div>')
-        .replace(/&lt;explicacion_señal&gt;/g, '<div style="background: rgba(233, 69, 96, 0.1); border-left: 3px solid #e94560; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #e94560;">📝 Explicación:</strong><br>')
-        .replace(/&lt;\/explicacion_señal&gt;/g, '</div>')
-        .replace(/<explicacion_señal>/g, '<div style="background: rgba(233, 69, 96, 0.1); border-left: 3px solid #e94560; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #e94560;">📝 Explicación:</strong><br>')
-        .replace(/<\/explicacion_señal>/g, '</div>')
-        // Señales destacadas
-        .replace(/LONG/g, '<span style="color: #81c784; font-weight: bold;">LONG</span>')
-        .replace(/SHORT/g, '<span style="color: #ef5350; font-weight: bold;">SHORT</span>')
-        // Separador de señales
-        .replace(/---\s*SEÑAL/g, '<hr style="border: none; border-top: 2px solid #0f3460; margin: 20px 0;"><strong style="color: #e94560; font-size: 16px;">📍 SEÑAL');
-      
-      return formatted;
-    }
-    
-    // Resetear análisis cuando se cambian los datos
-    loadDataBtn.addEventListener('click', () => {
-      // Resetear el contenedor de análisis
-      document.getElementById('analysisContent').style.display = 'none';
-      document.getElementById('analysisEmpty').style.display = 'block';
-      document.getElementById('analysisEmpty').innerHTML = '<p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada de las señales.</p>';
-      document.getElementById('analysisAccordionContent').style.display = 'none';
-      document.getElementById('accordionIcon').style.transform = 'rotate(0deg)';
-      
-      // Resetear el contenedor de backtest
-      document.getElementById('backtestContent').style.display = 'none';
-      document.getElementById('backtestEmpty').style.display = 'block';
-      document.getElementById('backtestEmpty').innerHTML = '<p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #00b4d8;">"Ejecutar Backtest"</strong> para simular el rendimiento histórico de las señales.</p>';
-      document.getElementById('backtestTradesContent').style.display = 'none';
-      document.getElementById('btAccordionIcon').style.transform = 'rotate(0deg)';
-    });
-    
-    console.log('✅ Sistema de análisis LLM cargado');
-    
-    // ==========================================
-    // BACKTEST: Funciones para ejecutar y visualizar backtest
-    // ==========================================
-    
-    async function runBacktest() {
-      const btn = document.getElementById('runBacktestBtn');
-      const btnIcon = document.getElementById('backtestButtonIcon');
-      const btnText = document.getElementById('backtestButtonText');
-      const loadingIndicator = document.getElementById('backtestLoadingIndicator');
-      const backtestContent = document.getElementById('backtestContent');
-      const backtestEmpty = document.getElementById('backtestEmpty');
-      const backtestError = document.getElementById('backtestError');
-      
-      const params = getSelectedParams();
-      
-      // Deshabilitar botón y mostrar loading
-      btn.disabled = true;
-      btnIcon.textContent = '⏳';
-      btnText.textContent = 'Ejecutando...';
-      loadingIndicator.style.display = 'block';
-      backtestContent.style.display = 'none';
-      backtestEmpty.style.display = 'none';
-      backtestError.style.display = 'none';
-      
-      console.log('📊 Ejecutando backtest para', params.ticker);
-      
-      try {
-        const response = await fetch(
-          `${API_BASE}/backtest/${encodeURIComponent(params.ticker)}?years=${params.years}&interval=${params.interval}`
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        console.log('✅ Backtest completado:', result);
-        
-        if (result.error) {
-          throw new Error(result.error);
-        }
-        
-        // Actualizar KPIs
-        updateBacktestKPIs(result.summary);
-        
-        // Renderizar tabla de trades
-        renderTradesTable(result.trades);
-        
-        // Actualizar contador de trades
-        document.getElementById('btTradeCount').textContent = result.trades.length;
-        
-        // Mostrar contenido
-        loadingIndicator.style.display = 'none';
-        backtestContent.style.display = 'block';
-        
-      } catch (error) {
-        console.error('❌ Error en backtest:', error);
-        loadingIndicator.style.display = 'none';
-        document.getElementById('backtestErrorText').textContent = error.message;
-        backtestError.style.display = 'block';
-        backtestEmpty.style.display = 'block';
-        backtestEmpty.innerHTML = `
-          <p style="margin: 0; font-size: 13px; color: #f44336;">
-            <strong>❌ Error:</strong> ${error.message}
-          </p>
-        `;
-      } finally {
-        btn.disabled = false;
-        btnIcon.textContent = '📊';
-        btnText.textContent = 'Ejecutar Backtest';
-      }
-    }
-    
-    function updateBacktestKPIs(summary) {
-      // Total Trades
-      document.getElementById('btTotalTrades').textContent = summary.total_trades;
-      
-      // Win Rate
-      document.getElementById('btWinRate').textContent = `${summary.win_rate.toFixed(1)}%`;
-      
-      // PnL Total con color
-      const pnlBox = document.getElementById('btPnlBox');
-      const pnlEl = document.getElementById('btTotalPnl');
-      const pnl = summary.total_pnl;
-      if (pnl >= 0) {
-        pnlBox.style.background = 'rgba(16, 185, 129, 0.15)';
-        pnlBox.style.borderColor = '#10b981';
-        pnlEl.style.color = '#10b981';
-        pnlEl.textContent = `+$${pnl.toFixed(2)}`;
-      } else {
-        pnlBox.style.background = 'rgba(239, 68, 68, 0.15)';
-        pnlBox.style.borderColor = '#ef4444';
-        pnlEl.style.color = '#ef4444';
-        pnlEl.textContent = `-$${Math.abs(pnl).toFixed(2)}`;
-      }
-      
-      // Max Drawdown
-      document.getElementById('btMaxDD').textContent = `${summary.max_drawdown_pct.toFixed(1)}%`;
-      
-      // Segunda fila
-      document.getElementById('btSharpe').textContent = summary.sharpe_ratio.toFixed(2);
-      document.getElementById('btProfitFactor').textContent = summary.profit_factor >= 999 ? '∞' : summary.profit_factor.toFixed(2);
-      document.getElementById('btBestTrade').textContent = `+$${summary.best_trade.toFixed(2)}`;
-      document.getElementById('btWorstTrade').textContent = `$${summary.worst_trade.toFixed(2)}`;
-      
-      // Capital
-      document.getElementById('btInitialCapital').textContent = `$${summary.initial_capital.toLocaleString()}`;
-      document.getElementById('btFinalEquity').textContent = `$${summary.final_equity.toLocaleString()}`;
-    }
-    
-    function renderTradesTable(trades) {
-      const tbody = document.getElementById('btTradesTableBody');
-      tbody.innerHTML = '';
-      
-      trades.forEach((trade, index) => {
-        const isLong = trade.side === 'LONG';
-        const isProfitable = trade.pnl > 0;
-        const isOpen = trade.status === 'OPEN';
-        
-        const row = document.createElement('tr');
-        row.style.borderBottom = '1px solid rgba(65, 90, 119, 0.3)';
-        
-        // Formatear duración
-        let durationStr = '—';
-        if (trade.duration_minutes !== null) {
-          if (trade.duration_minutes < 60) {
-            durationStr = `${trade.duration_minutes.toFixed(0)}m`;
-          } else if (trade.duration_minutes < 1440) {
-            durationStr = `${(trade.duration_minutes / 60).toFixed(1)}h`;
+      },
+
+      // UI methods
+      ui: {
+        getParams() {
+          return {
+            ticker: document.getElementById('tickerSelect').value,
+            years: parseFloat(document.getElementById('rangeSelect').value),
+            interval: document.getElementById('intervalSelect').value
+          };
+        },
+
+        showLoading(show) {
+          const overlay = document.getElementById('loadingOverlay');
+          overlay.style.display = show ? 'block' : 'none';
+        },
+
+        getDateFormat(years, interval) {
+          const formats = TradingApp.dateFormats[interval];
+          if (!formats) return { format: { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }, skip: 10 };
+          
+          const thresholds = Object.keys(formats).filter(k => k !== 'default').map(Number).sort((a, b) => b - a);
+          for (const threshold of thresholds) {
+            if (years >= threshold) return formats[threshold];
+          }
+          return formats.default;
+        },
+
+        getSignalDateFormat(interval, years) {
+          if (['1m', '5m', '15m'].includes(interval)) {
+            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+          }
+          if (interval === '1h') {
+            return years >= 1 
+              ? { day: '2-digit', month: 'short', year: 'numeric' }
+              : { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' };
+          }
+          if (interval === '1d') {
+            return { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+          }
+          return { month: 'long', year: 'numeric' };
+        },
+
+        formatSignalLabel(signal) {
+          if (signal === 1) return '<span class="signal-long">LONG ▲</span>';
+          if (signal === -1) return '<span class="signal-short">SHORT ▼</span>';
+          return '<span class="signal-neutral">—</span>';
+        },
+
+        updateStats(signals, params) {
+          const activeSignals = signals.filter(s => s.signal !== 0);
+          const longSignals = activeSignals.filter(s => s.signal === 1);
+          const shortSignals = activeSignals.filter(s => s.signal === -1);
+
+          document.getElementById('signalsCount').textContent = activeSignals.length;
+          
+          if (activeSignals.length > 0) {
+            const longPct = ((longSignals.length / activeSignals.length) * 100).toFixed(0);
+            const shortPct = ((shortSignals.length / activeSignals.length) * 100).toFixed(0);
+            document.getElementById('longCount').textContent = `${longSignals.length} (${longPct}%)`;
+            document.getElementById('shortCount').textContent = `${shortSignals.length} (${shortPct}%)`;
+
+            const prices = activeSignals.map(s => s.price);
+            document.getElementById('minPrice').textContent = `$${Math.min(...prices).toFixed(2)}`;
+            document.getElementById('maxPrice').textContent = `$${Math.max(...prices).toFixed(2)}`;
+
+            const periodFormat = params.interval === '1mo' 
+              ? { month: 'short', year: 'numeric' }
+              : { day: '2-digit', month: 'short', year: '2-digit' };
+            
+            const first = new Date(activeSignals[0].timestamp);
+            const last = new Date(activeSignals[activeSignals.length - 1].timestamp);
+            document.getElementById('dateRange').textContent = 
+              `${first.toLocaleDateString('es-ES', periodFormat)} - ${last.toLocaleDateString('es-ES', periodFormat)}`;
+          }
+        },
+
+        updateActiveSignal(signals, params) {
+          const activeSignals = signals.filter(s => s.signal !== 0);
+          if (activeSignals.length === 0) return;
+
+          const lastSignal = activeSignals[activeSignals.length - 1];
+          const signalBox = document.getElementById('activeSignalBox');
+          signalBox.style.display = 'block';
+
+          const signalType = lastSignal.signal === 1 ? 'LONG (Compra)' : 'SHORT (Venta)';
+          const signalDate = new Date(lastSignal.timestamp);
+          
+          let dateFormat;
+          if (params.interval === '1mo') {
+            dateFormat = { month: 'long', year: 'numeric' };
+          } else if (params.interval === '1d') {
+            dateFormat = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
           } else {
-            durationStr = `${(trade.duration_minutes / 1440).toFixed(1)}d`;
+            dateFormat = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+          }
+
+          document.getElementById('activeSignalType').textContent = `${signalType} - ${signalDate.toLocaleString('es-ES', dateFormat)}`;
+          document.getElementById('activePrice').textContent = `$${lastSignal.price.toFixed(2)}`;
+          document.getElementById('activeSL').textContent = lastSignal.sl ? `$${lastSignal.sl.toFixed(2)}` : 'N/A';
+          document.getElementById('activeTP').textContent = lastSignal.tp ? `$${lastSignal.tp.toFixed(2)}` : 'N/A';
+
+          if (lastSignal.sl && lastSignal.tp) {
+            const risk = Math.abs(lastSignal.price - lastSignal.sl);
+            const reward = Math.abs(lastSignal.tp - lastSignal.price);
+            document.getElementById('activeRR').textContent = `1:${(reward / risk).toFixed(2)}`;
+          } else {
+            document.getElementById('activeRR').textContent = 'N/A';
+          }
+        },
+
+        renderSignalsList(signals, params, explanations) {
+          const container = document.getElementById('signalsContainer');
+          container.innerHTML = '';
+
+          const activeSignals = signals.filter(s => s.signal !== 0);
+          
+          if (activeSignals.length === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 30px;">
+                <p class="text-muted">No hay señales activas para <strong>${params.ticker}</strong></p>
+                <p class="text-muted text-sm">Prueba con un rango mayor o intervalo diferente</p>
+              </div>`;
+            return;
+          }
+
+          const dateFormat = this.getSignalDateFormat(params.interval, params.years);
+          const reversedSignals = [...activeSignals].reverse();
+
+          reversedSignals.forEach((signal, index) => {
+            const signalType = signal.signal === 1 ? 'LONG' : 'SHORT';
+            const signalClass = signal.signal === 1 ? 'signal-long' : 'signal-short';
+            const signalIcon = signal.signal === 1 ? '▲' : '▼';
+            const signalAction = signal.signal === 1 ? 'Compra' : 'Venta';
+            const hasVotingData = signal.strategy_votes && signal.strategy_votes.length > 0;
+
+            const signalDate = new Date(signal.timestamp);
+            const fullDate = signalDate.toLocaleString('es-ES', dateFormat);
+            const shortDate = signalDate.toLocaleString('es-ES', {
+              day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit'
+            });
+
+            const item = document.createElement('div');
+            item.className = 'signal-item';
+            item.dataset.index = index;
+            item.dataset.timestamp = signal.timestamp;
+
+            if (hasVotingData) {
+              item.dataset.strategyVotes = JSON.stringify(signal.strategy_votes);
+              item.dataset.longVotes = signal.long_votes || 0;
+              item.dataset.shortVotes = signal.short_votes || 0;
+              item.dataset.neutralVotes = signal.neutral_votes || 0;
+              item.dataset.finalSignal = signal.signal;
+              item.dataset.price = signal.price;
+              item.dataset.score = signal.score;
+            }
+
+            const votingBadge = hasVotingData 
+              ? `<span class="badge badge--primary" style="margin-left: 8px;">${signal.long_votes || 0}L / ${signal.short_votes || 0}S</span>`
+              : '';
+
+            item.innerHTML = `
+              <div class="signal-header">
+                <span class="signal-type ${signalClass}">${signalIcon} ${signalType} (${signalAction}) ${votingBadge}</span>
+                <span class="signal-time">${shortDate}</span>
+              </div>
+              <div style="font-size: var(--font-sm); color: var(--color-primary); margin-bottom: 4px; font-weight: 500;">${fullDate}</div>
+              <div class="signal-price">Precio: $${signal.price.toFixed(2)}</div>
+              <div class="signal-details">
+                <strong>Confianza:</strong> ${(signal.score * 100).toFixed(0)}% | 
+                <strong>SL:</strong> $${signal.sl ? signal.sl.toFixed(2) : 'N/A'} | 
+                <strong>TP:</strong> $${signal.tp ? signal.tp.toFixed(2) : 'N/A'}
+              </div>
+              ${hasVotingData ? '<div class="text-muted text-sm" style="text-align: center; margin-top: 6px;">Clic para ver detalle de votación</div>' : ''}
+              <div class="signal-explanation">
+                <strong>Explicación IA:</strong><br>
+                ${explanations.text || 'Análisis técnico basado en cruces de EMAs y confirmación de indicadores.'}
+              </div>
+              <div style="text-align: right; margin-top: 4px;">
+                <span class="expand-icon">▼ Ver más</span>
+              </div>
+            `;
+
+            item.addEventListener('click', function(e) {
+              if (hasVotingData) {
+                TradingApp.ui.showVotingDetail(this);
+              }
+              this.classList.toggle('expanded');
+              const icon = this.querySelector('.expand-icon');
+              icon.textContent = this.classList.contains('expanded') ? '▲ Ver menos' : '▼ Ver más';
+            });
+
+            container.appendChild(item);
+          });
+        },
+
+        showVotingDetail(element) {
+          const container = document.getElementById('votingDetailContainer');
+          const votes = JSON.parse(element.dataset.strategyVotes || '[]');
+          const longVotes = parseInt(element.dataset.longVotes) || 0;
+          const shortVotes = parseInt(element.dataset.shortVotes) || 0;
+          const neutralVotes = parseInt(element.dataset.neutralVotes) || 0;
+          const finalSignal = parseInt(element.dataset.finalSignal);
+          const price = parseFloat(element.dataset.price);
+          const score = parseFloat(element.dataset.score);
+          const timestamp = element.dataset.timestamp;
+
+          const signalDate = new Date(timestamp);
+          const dateStr = signalDate.toLocaleString('es-ES', {
+            weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+          });
+
+          document.getElementById('votingTitle').innerHTML = 
+            `Detalle de Votación - <span style="color: var(--color-primary);">${dateStr}</span> - Precio: $${price.toFixed(2)}`;
+
+          const finalText = finalSignal === 1 ? 'LONG' : finalSignal === -1 ? 'SHORT' : 'NEUTRAL';
+          const finalColor = finalSignal === 1 ? 'var(--color-success)' : finalSignal === -1 ? 'var(--color-danger)' : 'var(--color-neutral)';
+          
+          document.getElementById('votingFinalSignal').innerHTML = `<span style="color: ${finalColor}">${finalText}</span>`;
+          document.getElementById('votingLongCount').textContent = longVotes;
+          document.getElementById('votingShortCount').textContent = shortVotes;
+          document.getElementById('votingNeutralCount').textContent = neutralVotes;
+
+          const grid = document.getElementById('strategyVotesGrid');
+          grid.innerHTML = '';
+
+          votes.forEach(vote => {
+            const voteColor = vote.vote === 'LONG' ? 'var(--color-success)' : vote.vote === 'SHORT' ? 'var(--color-danger)' : 'var(--color-neutral)';
+            const voteBg = vote.vote === 'LONG' ? 'var(--color-success-light)' : vote.vote === 'SHORT' ? 'var(--color-danger-light)' : '#f5f5f5';
+            const voteBorder = vote.vote === 'LONG' ? '#a5d6a7' : vote.vote === 'SHORT' ? '#ef9a9a' : 'var(--color-border)';
+            const scorePercent = (vote.score * 100).toFixed(0);
+
+            const card = document.createElement('div');
+            card.className = 'strategy-card';
+            card.style.background = voteBg;
+            card.style.borderColor = voteBorder;
+            card.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 600; font-size: var(--font-base); color: var(--color-text);">${TradingApp.strategyNames[vote.name] || vote.name}</span>
+              </div>
+              <div style="font-size: var(--font-xl); font-weight: bold; color: ${voteColor}; margin-bottom: 4px;">${vote.vote}</div>
+              <div style="font-size: var(--font-sm); color: var(--color-text-muted);">Score: <strong>${scorePercent}%</strong></div>
+              <div style="font-size: var(--font-xs); color: #888; line-height: 1.3;">${TradingApp.strategyDescriptions[vote.name] || 'Estrategia de trading algorítmico'}</div>
+            `;
+            grid.appendChild(card);
+          });
+
+          const totalVotes = longVotes + shortVotes + neutralVotes;
+          const majority = Math.ceil(totalVotes / 2) + (totalVotes % 2 === 0 ? 1 : 0);
+          const winningVotes = finalSignal === 1 ? longVotes : finalSignal === -1 ? shortVotes : 0;
+
+          document.getElementById('votingInfo').innerHTML = `
+            <strong>Metodología:</strong> La señal final se determina por <em>votación mayoritaria</em>. 
+            Se requiere al menos <strong>${majority}/${totalVotes}</strong> votos para generar una señal.
+            ${finalSignal !== 0 ? `<br><strong>Resultado:</strong> ${winningVotes} de ${totalVotes} estrategias votaron ${finalSignal === 1 ? 'LONG' : 'SHORT'} (${((winningVotes/totalVotes)*100).toFixed(0)}% consenso).` : ''}
+            <br><strong>Score final:</strong> ${(score * 100).toFixed(0)}% (promedio de estrategias coincidentes).
+          `;
+
+          container.style.display = 'block';
+          container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        },
+
+        hideVotingDetail() {
+          document.getElementById('votingDetailContainer').style.display = 'none';
+        },
+
+        toggleAccordion(type) {
+          const isAnalysis = type === 'analysis';
+          const content = document.getElementById(isAnalysis ? 'analysisAccordionContent' : 'backtestTradesContent');
+          const icon = document.getElementById(isAnalysis ? 'accordionIcon' : 'btAccordionIcon');
+
+          if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+          } else {
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+          }
+        },
+
+        resetSections() {
+          // Reset analysis
+          document.getElementById('analysisContent').style.display = 'none';
+          document.getElementById('analysisEmpty').style.display = 'block';
+          document.getElementById('analysisEmpty').innerHTML = '<p style="margin: 0; font-size: var(--font-base);">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada.</p>';
+          document.getElementById('analysisAccordionContent').style.display = 'none';
+          document.getElementById('accordionIcon').style.transform = 'rotate(0deg)';
+
+          // Reset backtest
+          document.getElementById('backtestContent').style.display = 'none';
+          document.getElementById('backtestEmpty').style.display = 'block';
+          document.getElementById('backtestEmpty').innerHTML = '<p style="margin: 0; font-size: var(--font-base);">Presiona <strong style="color: var(--color-accent);">"Ejecutar Backtest"</strong> para simular el rendimiento histórico.</p>';
+          document.getElementById('backtestTradesContent').style.display = 'none';
+          document.getElementById('btAccordionIcon').style.transform = 'rotate(0deg)';
+        }
+      },
+
+      // Chart methods
+      chart: {
+        create(signals, params) {
+          const ctx = document.getElementById('priceChart').getContext('2d');
+          
+          if (TradingApp.state.chart) {
+            TradingApp.state.chart.destroy();
+            TradingApp.state.chart = null;
+          }
+
+          const maxBars = TradingApp.config.MAX_CHART_BARS;
+          const chartData = signals.length > maxBars ? signals.slice(-maxBars) : signals;
+
+          const candlestickData = chartData.map((s, i) => ({
+            x: i,
+            o: s.open,
+            h: s.high,
+            l: s.low,
+            c: s.close,
+            signal: s.signal,
+            timestamp: s.timestamp
+          }));
+
+          const longSignals = chartData.map((s, i) => ({
+            x: i,
+            y: s.signal === 1 ? s.price : null,
+            timestamp: s.timestamp
+          })).filter(p => p.y !== null);
+
+          const shortSignals = chartData.map((s, i) => ({
+            x: i,
+            y: s.signal === -1 ? s.price : null,
+            timestamp: s.timestamp
+          })).filter(p => p.y !== null);
+
+          const dateFormatConfig = TradingApp.ui.getDateFormat(params.years, params.interval);
+
+          TradingApp.state.chart = new Chart(ctx, {
+            type: 'candlestick',
+            data: {
+              datasets: [
+                {
+                  label: 'Precio',
+                  data: candlestickData,
+                  borderColor: '#333',
+                  backgroundColors: {
+                    up: '#26a69a',
+                    down: '#ef5350',
+                    unchanged: '#999'
+                  }
+                },
+                {
+                  label: 'LONG ▲',
+                  type: 'scatter',
+                  data: longSignals,
+                  backgroundColor: '#4CAF50',
+                  borderColor: '#2E7D32',
+                  borderWidth: 2,
+                  pointRadius: 8,
+                  pointStyle: 'triangle',
+                  rotation: 0
+                },
+                {
+                  label: 'SHORT ▼',
+                  type: 'scatter',
+                  data: shortSignals,
+                  backgroundColor: '#F44336',
+                  borderColor: '#C62828',
+                  borderWidth: 2,
+                  pointRadius: 8,
+                  pointStyle: 'triangle',
+                  rotation: 180
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  titleColor: '#fff',
+                  bodyColor: '#fff',
+                  borderColor: 'var(--color-primary)',
+                  borderWidth: 1,
+                  padding: 12,
+                  displayColors: true,
+                  callbacks: {
+                    title: (context) => {
+                      const index = context[0].parsed.x;
+                      if (chartData[index]) {
+                        const date = new Date(chartData[index].timestamp);
+                        return date.toLocaleString('es-ES', {
+                          weekday: 'short', day: '2-digit', month: 'short',
+                          year: 'numeric', hour: '2-digit', minute: '2-digit'
+                        });
+                      }
+                      return '';
+                    },
+                    label: (context) => {
+                      const label = context.dataset.label || '';
+                      const index = context.parsed.x;
+                      
+                      if (label === 'Precio' && chartData[index]) {
+                        const candle = chartData[index];
+                        return [
+                          `Apertura: $${candle.open.toFixed(2)}`,
+                          `Máximo: $${candle.high.toFixed(2)}`,
+                          `Mínimo: $${candle.low.toFixed(2)}`,
+                          `Cierre: $${candle.close.toFixed(2)}`
+                        ];
+                      }
+                      
+                      if (context.parsed.y !== undefined && context.parsed.y !== null) {
+                        return `${label}: $${context.parsed.y.toFixed(2)}`;
+                      }
+                      return null;
+                    },
+                    labelColor: (context) => {
+                      const colors = {
+                        'LONG ▲': { borderColor: '#4CAF50', backgroundColor: '#4CAF50' },
+                        'SHORT ▼': { borderColor: '#F44336', backgroundColor: '#F44336' }
+                      };
+                      return colors[context.dataset.label] || { borderColor: 'var(--color-primary)', backgroundColor: 'var(--color-primary)' };
+                    }
+                  }
+                },
+                zoom: {
+                  zoom: {
+                    wheel: { enabled: true, speed: 0.1 },
+                    pinch: { enabled: true },
+                    drag: {
+                      enabled: true,
+                      backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                      borderColor: 'rgba(33, 150, 243, 0.5)',
+                      borderWidth: 1
+                    },
+                    mode: 'xy'
+                  },
+                  pan: { enabled: true, mode: 'xy' },
+                  limits: {
+                    x: { min: 'original', max: 'original' },
+                    y: { min: 'original', max: 'original' }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  type: 'linear',
+                  min: 0,
+                  max: chartData.length - 1,
+                  ticks: {
+                    maxRotation: 45,
+                    minRotation: 0,
+                    autoSkip: true,
+                    autoSkipPadding: 15,
+                    maxTicksLimit: 12,
+                    callback: (value, index) => {
+                      if (!Number.isInteger(value) || value < 0 || value >= chartData.length) return '';
+                      const dynamicSkip = Math.max(1, Math.floor(chartData.length / 10));
+                      if (value % dynamicSkip !== 0 && value !== chartData.length - 1) return '';
+                      if (chartData[value]) {
+                        const date = new Date(chartData[value].timestamp);
+                        return date.toLocaleString('es-ES', dateFormatConfig.format);
+                      }
+                      return '';
+                    },
+                    font: { size: 10 }
+                  },
+                  grid: { display: true, color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                y: {
+                  display: true,
+                  position: 'right',
+                  ticks: { callback: (value) => value.toFixed(2) }
+                }
+              },
+              interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            }
+          });
+        },
+
+        reset() {
+          if (TradingApp.state.chart) {
+            TradingApp.state.chart.resetZoom();
           }
         }
+      },
+
+      // Analysis methods
+      analysis: {
+        async generate() {
+          const btn = document.getElementById('generateAnalysisBtn');
+          const btnIcon = document.getElementById('analysisButtonIcon');
+          const btnText = document.getElementById('analysisButtonText');
+          const loading = document.getElementById('analysisLoadingIndicator');
+          const content = document.getElementById('analysisContent');
+          const empty = document.getElementById('analysisEmpty');
+          const error = document.getElementById('analysisError');
+
+          const params = TradingApp.ui.getParams();
+          const activeSignals = TradingApp.state.signals.filter(s => s.signal !== 0);
+
+          if (activeSignals.length === 0) {
+            alert('No hay señales activas para analizar.');
+            return;
+          }
+
+          btn.disabled = true;
+          btnIcon.textContent = '...';
+          btnText.textContent = 'Analizando...';
+          loading.style.display = 'block';
+          content.style.display = 'none';
+          empty.style.display = 'none';
+          error.style.display = 'none';
+
+          try {
+            const result = await TradingApp.api.postAnalysis({
+              ticker: params.ticker,
+              signals: TradingApp.state.signals,
+              use_cache: true
+            });
+
+            document.getElementById('analysisSignalCount').textContent = result.signal_count;
+            document.getElementById('analysisCacheStatus').innerHTML = result.cached 
+              ? '<span style="color: #81c784;">Desde caché</span>'
+              : '<span style="color: #4fc3f7;">Nuevo</span>';
+
+            document.getElementById('analysisText').innerHTML = this.formatText(result.analysis);
+
+            if (result.error) {
+              document.getElementById('analysisErrorText').textContent = result.error;
+              error.style.display = 'block';
+            }
+
+            loading.style.display = 'none';
+            content.style.display = 'block';
+            document.getElementById('analysisAccordionContent').style.display = 'block';
+            document.getElementById('accordionIcon').style.transform = 'rotate(180deg)';
+
+          } catch (err) {
+            console.error('Analysis error:', err);
+            loading.style.display = 'none';
+            empty.style.display = 'block';
+            empty.innerHTML = `<p style="margin: 0; color: #f44336;"><strong>Error:</strong> ${err.message}</p>`;
+          } finally {
+            btn.disabled = false;
+            btnIcon.textContent = '+';
+            btnText.textContent = 'Generar Análisis';
+          }
+        },
+
+        formatText(text) {
+          return text
+            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`(.*?)`/g, '<code>$1</code>')
+            .replace(/\n/g, '<br>')
+            .replace(/<analisis>/g, '<div style="background: rgba(79, 195, 247, 0.1); border-left: 3px solid #4fc3f7; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #4fc3f7;">Análisis:</strong><br>')
+            .replace(/<\/analisis>/g, '</div>')
+            .replace(/<explicacion_señal>/g, '<div style="background: rgba(233, 69, 96, 0.1); border-left: 3px solid #e94560; padding: 12px; margin: 12px 0; border-radius: 0 8px 8px 0;"><strong style="color: #e94560;">Explicación:</strong><br>')
+            .replace(/<\/explicacion_señal>/g, '</div>')
+            .replace(/LONG/g, '<span style="color: #81c784; font-weight: bold;">LONG</span>')
+            .replace(/SHORT/g, '<span style="color: #ef5350; font-weight: bold;">SHORT</span>');
+        }
+      },
+
+      // Backtest methods
+      backtest: {
+        async run() {
+          const btn = document.getElementById('runBacktestBtn');
+          const btnIcon = document.getElementById('backtestButtonIcon');
+          const btnText = document.getElementById('backtestButtonText');
+          const loading = document.getElementById('backtestLoadingIndicator');
+          const content = document.getElementById('backtestContent');
+          const empty = document.getElementById('backtestEmpty');
+          const error = document.getElementById('backtestError');
+
+          const params = TradingApp.ui.getParams();
+
+          btn.disabled = true;
+          btnIcon.textContent = '...';
+          btnText.textContent = 'Ejecutando...';
+          loading.style.display = 'block';
+          content.style.display = 'none';
+          empty.style.display = 'none';
+          error.style.display = 'none';
+
+          try {
+            const result = await TradingApp.api.runBacktest(params.ticker, params.years, params.interval);
+
+            if (result.error) throw new Error(result.error);
+
+            this.updateKPIs(result.summary);
+            this.renderTrades(result.trades);
+
+            document.getElementById('btTradeCount').textContent = result.trades.length;
+
+            loading.style.display = 'none';
+            content.style.display = 'block';
+
+          } catch (err) {
+            console.error('Backtest error:', err);
+            document.getElementById('backtestErrorText').textContent = err.message;
+            error.style.display = 'block';
+            loading.style.display = 'none';
+            empty.style.display = 'block';
+            empty.innerHTML = `<p style="margin: 0; color: #f44336;"><strong>Error:</strong> ${err.message}</p>`;
+          } finally {
+            btn.disabled = false;
+            btnIcon.textContent = '▶';
+            btnText.textContent = 'Ejecutar Backtest';
+          }
+        },
+
+        updateKPIs(summary) {
+          document.getElementById('btTotalTrades').textContent = summary.total_trades;
+          document.getElementById('btWinRate').textContent = `${summary.win_rate.toFixed(1)}%`;
+
+          const pnlBox = document.getElementById('btPnlBox');
+          const pnlEl = document.getElementById('btTotalPnl');
+          const pnl = summary.total_pnl;
+
+          if (pnl >= 0) {
+            pnlBox.className = 'kpi-box kpi-box--success';
+            pnlEl.className = 'kpi-value kpi-value--success';
+            pnlEl.textContent = `+$${pnl.toFixed(2)}`;
+          } else {
+            pnlBox.className = 'kpi-box kpi-box--danger';
+            pnlEl.className = 'kpi-value kpi-value--danger';
+            pnlEl.textContent = `-$${Math.abs(pnl).toFixed(2)}`;
+          }
+
+          document.getElementById('btMaxDD').textContent = `${summary.max_drawdown_pct.toFixed(1)}%`;
+          document.getElementById('btSharpe').textContent = summary.sharpe_ratio.toFixed(2);
+          document.getElementById('btProfitFactor').textContent = summary.profit_factor >= 999 ? '∞' : summary.profit_factor.toFixed(2);
+          document.getElementById('btBestTrade').textContent = `+$${summary.best_trade.toFixed(2)}`;
+          document.getElementById('btWorstTrade').textContent = `$${summary.worst_trade.toFixed(2)}`;
+          document.getElementById('btInitialCapital').textContent = `$${summary.initial_capital.toLocaleString()}`;
+          document.getElementById('btFinalEquity').textContent = `$${summary.final_equity.toLocaleString()}`;
+        },
+
+        renderTrades(trades) {
+          const tbody = document.getElementById('btTradesTableBody');
+          tbody.innerHTML = '';
+
+          trades.forEach(trade => {
+            const isLong = trade.side === 'LONG';
+            const isProfitable = trade.pnl > 0;
+            const isOpen = trade.status === 'OPEN';
+
+            let durationStr = '—';
+            if (trade.duration_minutes !== null) {
+              const mins = trade.duration_minutes;
+              if (mins < 60) durationStr = `${mins}m`;
+              else if (mins < 1440) durationStr = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+              else durationStr = `${Math.floor(mins / 1440)}d ${Math.floor((mins % 1440) / 60)}h`;
+            }
+
+            let entryDateStr = '—';
+            try {
+              const entryDate = new Date(trade.entry_time);
+              entryDateStr = entryDate.toLocaleDateString('es', { day: '2-digit', month: 'short', year: '2-digit' }) +
+                           ' ' + entryDate.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+            } catch {}
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td style="color: #e0e1dd;">${trade.id}</td>
+              <td style="color: #778da9; font-size: var(--font-sm); white-space: nowrap;">${entryDateStr}</td>
+              <td><span class="trade-side ${isLong ? 'trade-side--long' : 'trade-side--short'}">${trade.side}</span></td>
+              <td style="text-align: right; color: #e0e1dd; font-family: monospace;">$${trade.entry_price.toFixed(2)}</td>
+              <td style="text-align: right; color: #e0e1dd; font-family: monospace;">
+                ${isOpen ? '<span style="color: #fbbf24;">ABIERTO</span>' : '$' + trade.exit_price.toFixed(2)}
+              </td>
+              <td style="text-align: right; font-weight: bold; font-family: monospace; color: ${isProfitable ? '#10b981' : '#ef4444'};">
+                ${isOpen ? '—' : (isProfitable ? '+' : '') + '$' + trade.pnl.toFixed(2)}
+              </td>
+              <td style="text-align: center;">
+                ${isOpen ? '—' : `<span class="badge ${trade.exit_reason === 'TP' ? 'badge--success' : 'badge--danger'}">${trade.exit_reason}</span>`}
+              </td>
+              <td style="text-align: right; color: #778da9; font-size: var(--font-sm);">${durationStr}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      },
+
+      // Auto-refresh methods
+      autoRefresh: {
+        start() {
+          TradingApp.state.secondsUntilRefresh = 60;
+          this.updateIndicator();
+
+          TradingApp.state.countdownTimer = setInterval(() => {
+            TradingApp.state.secondsUntilRefresh--;
+            this.updateIndicator();
+          }, 1000);
+
+          TradingApp.state.autoRefreshTimer = setInterval(() => {
+            TradingApp.state.secondsUntilRefresh = 60;
+            TradingApp.init();
+          }, TradingApp.config.AUTO_REFRESH_INTERVAL);
+        },
+
+        updateIndicator() {
+          document.getElementById('refresh-indicator').textContent = 
+            `Auto-refresh: ${TradingApp.state.secondsUntilRefresh}s`;
+        }
+      },
+
+      // Main initialization
+      async init() {
+        const params = this.ui.getParams();
         
-        // Formatear fecha de entrada
-        let entryTimeStr = '—';
-        try {
-          const entryDate = new Date(trade.entry_time);
-          entryTimeStr = entryDate.toLocaleDateString('es', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        } catch {}
-        
-        // Formatear fecha de entrada
-        let entryDateStr = '—';
-        try {
-          const entryDate = new Date(trade.entry_time);
-          entryDateStr = entryDate.toLocaleDateString('es', { day: '2-digit', month: 'short', year: '2-digit' }) + 
-                         ' ' + entryDate.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
-        } catch {}
-        
-        row.innerHTML = `
-          <td style="padding: 10px 8px; color: #e0e1dd;">${trade.id}</td>
-          <td style="padding: 10px 8px; color: #778da9; font-size: 11px; white-space: nowrap;">${entryDateStr}</td>
-          <td style="padding: 10px 8px;">
-            <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;
-              background: ${isLong ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-              color: ${isLong ? '#10b981' : '#ef4444'};">
-              ${trade.side}
-            </span>
-          </td>
-          <td style="padding: 10px 8px; text-align: right; color: #e0e1dd; font-family: monospace;">$${trade.entry_price.toFixed(2)}</td>
-          <td style="padding: 10px 8px; text-align: right; color: #e0e1dd; font-family: monospace;">
-            ${isOpen ? '<span style="color: #fbbf24;">ABIERTO</span>' : '$' + trade.exit_price.toFixed(2)}
-          </td>
-          <td style="padding: 10px 8px; text-align: right; font-weight: bold; font-family: monospace;
-            color: ${isProfitable ? '#10b981' : '#ef4444'};">
-            ${isOpen ? '—' : (isProfitable ? '+' : '') + '$' + trade.pnl.toFixed(2)}
-          </td>
-          <td style="padding: 10px 8px; text-align: center;">
-            ${isOpen ? '—' : `<span style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;
-              background: ${trade.exit_reason === 'TP' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-              color: ${trade.exit_reason === 'TP' ? '#10b981' : '#ef4444'};">
-              ${trade.exit_reason}
-            </span>`}
-          </td>
-          <td style="padding: 10px 8px; text-align: right; color: #778da9; font-size: 11px;">${durationStr}</td>
-        `;
-        
-        tbody.appendChild(row);
-      });
-    }
-    
-    function toggleBacktestAccordion() {
-      const content = document.getElementById('backtestTradesContent');
-      const icon = document.getElementById('btAccordionIcon');
-      
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-        icon.style.transform = 'rotate(180deg)';
-      } else {
-        content.style.display = 'none';
-        icon.style.transform = 'rotate(0deg)';
+        document.getElementById('currentTicker').textContent = params.ticker;
+        this.ui.showLoading(true);
+
+        const signals = await this.api.getSignals(params);
+        this.state.signals = signals;
+
+        this.ui.showLoading(false);
+
+        if (signals.length === 0) {
+          document.getElementById('signalsContainer').innerHTML = `
+            <div style="text-align: center; padding: 30px;">
+              <p class="text-muted">No hay datos disponibles para <strong>${params.ticker}</strong></p>
+              <p class="text-muted text-sm">Prueba con un rango mayor o intervalo diferente</p>
+            </div>`;
+          return;
+        }
+
+        const explanations = await this.api.getExplanations();
+        const activeSignals = signals.filter(s => s.signal !== 0);
+
+        this.ui.updateStats(signals, params);
+        this.ui.updateActiveSignal(signals, params);
+        this.ui.renderSignalsList(signals, params, explanations);
+        this.chart.create(signals, params);
+      },
+
+      // Setup event listeners
+      setup() {
+        document.getElementById('loadDataBtn').addEventListener('click', () => {
+          this.ui.resetSections();
+          this.init();
+        });
+
+        document.getElementById('resetZoom').addEventListener('click', () => this.chart.reset());
+
+        document.getElementById('intervalSelect').addEventListener('change', function() {
+          const interval = this.value;
+          const rangeSelect = document.getElementById('rangeSelect');
+
+          // Adjust range limits based on interval
+          if (interval === '1m' && parseFloat(rangeSelect.value) > 0.02) {
+            rangeSelect.value = '0.02';
+          } else if (['5m', '15m'].includes(interval) && parseFloat(rangeSelect.value) > 0.17) {
+            rangeSelect.value = '0.08';
+          }
+        });
+
+        // Initialize
+        this.init();
+        this.autoRefresh.start();
       }
-    }
-    
-    console.log('✅ Sistema de Backtest cargado');
+    };
+
+    // Start application
+    TradingApp.setup();
   </script>
 </body>
-
 </html>
