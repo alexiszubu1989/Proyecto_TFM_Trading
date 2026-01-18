@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from pathlib import Path
 import pandas as pd
 from mvpfx.config import get_cfg
@@ -22,8 +22,9 @@ from mvpfx.data import load_data
 from mvpfx.indicators import compute_all_indicators
 from mvpfx.strategy import generate_signals, STRATEGIES
 from mvpfx.llm_stub import explain_trade, analyze_signals, clear_analysis_cache
+from mvpfx.backtest import run_backtest_for_api
 
-app = FastAPI(title="MVP Trading API", version="4.1.0")
+app = FastAPI(title="MVP Trading API", version="4.2.0")
 cfg = get_cfg()
 
 # Obtener ruta del directorio base del proyecto
@@ -328,6 +329,126 @@ def serve_backtest_report():
     if report_path.exists():
         return FileResponse(str(report_path))
     return {"metrics": {}, "signals": []}
+
+
+# ========== NUEVO ENDPOINT DE BACKTEST ==========
+
+class BacktestRequest(BaseModel):
+    """Parámetros opcionales para el backtest"""
+    capital: Optional[float] = None
+    risk_pct: Optional[float] = None
+    sl_atr_mult: Optional[float] = None
+    tp_atr_mult: Optional[float] = None
+
+
+@app.get("/backtest/{ticker}")
+def get_backtest(
+    ticker: str,
+    years: Optional[float] = Query(0.25, description="Años de datos históricos"),
+    interval: Optional[str] = Query("1h", description="Intervalo de velas (1h, 1d recomendados)"),
+    capital: Optional[float] = Query(None, description="Capital inicial (default: 10000)"),
+    risk_pct: Optional[float] = Query(None, description="% de riesgo por trade (default: 0.75)"),
+):
+    """
+    Ejecuta un backtest para el ticker especificado y retorna resultados detallados.
+    
+    Incluye:
+    - Resumen con métricas de rendimiento (Win Rate, PnL, Sharpe, etc.)
+    - Lista de todos los trades con entrada, salida, PnL y duración
+    - Curva de equity simplificada para gráficos
+    """
+    import yfinance as yf
+    from datetime import datetime, timedelta
+    
+    # Obtener configuración del intervalo
+    interval_cfg = INTERVAL_MAP.get(interval, INTERVAL_MAP["1h"])
+    
+    # Calcular fechas
+    end_date = datetime.now()
+    days_back = min(int(years * 365), interval_cfg["max_days"])
+    start_date = end_date - timedelta(days=days_back)
+    
+    # Normalizar símbolo para Forex
+    symbol = ticker
+    if ticker.upper().replace(".", "") in ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"]:
+        if not ticker.endswith("=X"):
+            symbol = ticker.replace(".", "").upper() + "=X"
+    
+    # Descargar datos
+    try:
+        ticker_obj = yf.Ticker(symbol)
+        df = ticker_obj.history(
+            start=start_date.strftime("%Y-%m-%d"),
+            end=end_date.strftime("%Y-%m-%d"),
+            interval=interval_cfg["yf_interval"]
+        )
+        
+        if df.empty:
+            period_str = f"{days_back}d" if days_back <= 730 else f"{years}y"
+            df = ticker_obj.history(period=period_str, interval=interval_cfg["yf_interval"])
+    except Exception as e:
+        return {"error": f"Error descargando datos: {str(e)}", "ticker": ticker}
+    
+    if df is None or df.empty:
+        return {"error": "No hay datos disponibles para este ticker/período", "ticker": ticker}
+    
+    # Normalizar columnas
+    df.columns = df.columns.str.lower()
+    df = df[["open", "high", "low", "close", "volume"]]
+    
+    # Asegurar timezone UTC
+    if df.index.tz is None:
+        df.index = df.index.tz_localize("UTC")
+    else:
+        df.index = df.index.tz_convert("UTC")
+    
+    # Crear config con parámetros custom
+    temp_cfg = cfg.copy()
+    temp_cfg["timeframe"] = interval_cfg["tf_code"]
+    
+    # Aplicar parámetros personalizados si se proporcionaron
+    if capital is not None:
+        temp_cfg["risk"]["capital"] = capital
+    if risk_pct is not None:
+        temp_cfg["risk"]["risk_pct"] = risk_pct / 100  # Convertir de % a decimal
+    
+    # Calcular indicadores
+    df = compute_all_indicators(df, temp_cfg)
+    
+    # Aplicar warmup
+    warmup = temp_cfg["warmup_bars"]
+    if len(df) > warmup:
+        df = df.iloc[warmup:].copy()
+    
+    # Generar señales
+    df = generate_signals(df, temp_cfg)
+    
+    # Ejecutar backtest
+    try:
+        result = run_backtest_for_api(df=df, cfg=temp_cfg, ticker=ticker)
+        return result
+    except Exception as e:
+        return {"error": f"Error en backtest: {str(e)}", "ticker": ticker}
+
+
+@app.post("/backtest/{ticker}")
+def post_backtest(
+    ticker: str,
+    request: BacktestRequest,
+    years: Optional[float] = Query(0.25, description="Años de datos históricos"),
+    interval: Optional[str] = Query("1h", description="Intervalo de velas"),
+):
+    """
+    Versión POST del backtest que permite configuración avanzada en el body.
+    """
+    return get_backtest(
+        ticker=ticker,
+        years=years,
+        interval=interval,
+        capital=request.capital,
+        risk_pct=request.risk_pct
+    )
+
 
 if __name__ == "__main__":
     import uvicorn
