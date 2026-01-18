@@ -93,10 +93,8 @@ execution:
 
 # --- Datos ---
 data:
-  source: "yfinance"             # "simulated" | "ib" | "csv" | "yfinance"
-  csv_path: "./data/eurusd.csv"   # si source=csv
-  bars: 250                      # Suficiente para M5 con warmup de 50
-  seed: 42
+  source: "yfinance"             # "yfinance" | "ib"
+  bars: 250                      # Número de barras para yfinance
 
 # --- API ---
 api:
