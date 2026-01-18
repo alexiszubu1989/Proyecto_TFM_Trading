@@ -601,6 +601,132 @@
       </div>
       <!-- ========== FIN CONTENEDOR DE ANÁLISIS LLM ========== -->
       
+      <!-- ========== CONTENEDOR DE BACKTEST ========== -->
+      <div id="backtestContainer" style="margin-top: 16px; background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%); border-radius: 12px; padding: 16px; border: 2px solid #415a77; box-shadow: 0 4px 20px rgba(65, 90, 119, 0.3);">
+        
+        <!-- Header con botón -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; color: #00b4d8; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">💰</span> Backtest - Resultados de Trading
+          </h4>
+          <button id="runBacktestBtn" onclick="runBacktest()" 
+                  style="background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);">
+            <span id="backtestButtonIcon">📊</span>
+            <span id="backtestButtonText">Ejecutar Backtest</span>
+          </button>
+        </div>
+        
+        <!-- Info del backtest -->
+        <div style="background: rgba(0, 180, 216, 0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 3px solid #00b4d8;">
+          <p style="margin: 0; font-size: 12px; color: #a0a0a0; line-height: 1.5;">
+            <strong style="color: #00b4d8;">¿Qué hace?</strong> Simula la ejecución de todas las señales generadas en el período seleccionado, calculando el rendimiento histórico con gestión de riesgo real.
+          </p>
+        </div>
+        
+        <!-- Indicador de carga -->
+        <div id="backtestLoadingIndicator" style="display: none; text-align: center; padding: 40px 20px;">
+          <div style="display: inline-block; position: relative; width: 80px; height: 80px;">
+            <div style="position: absolute; width: 60px; height: 60px; border: 4px solid transparent; border-top-color: #00b4d8; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <div style="position: absolute; width: 45px; height: 45px; top: 7.5px; left: 7.5px; border: 4px solid transparent; border-top-color: #0077b6; border-radius: 50%; animation: spin 1.5s linear infinite reverse;"></div>
+            <div style="position: absolute; width: 30px; height: 30px; top: 15px; left: 15px; border: 4px solid transparent; border-top-color: #90e0ef; border-radius: 50%; animation: spin 2s linear infinite;"></div>
+          </div>
+          <p style="margin-top: 16px; color: #00b4d8; font-weight: bold; font-size: 14px;">📈 Ejecutando backtest...</p>
+          <p style="margin: 8px 0 0 0; color: #a0a0a0; font-size: 12px;">Simulando trades históricos</p>
+        </div>
+        
+        <!-- Contenido del backtest -->
+        <div id="backtestContent" style="display: none;">
+          
+          <!-- KPIs Grid -->
+          <div id="backtestKPIs" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
+            <div style="background: rgba(0, 180, 216, 0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #415a77;">
+              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">Trades</div>
+              <div id="btTotalTrades" style="font-size: 22px; font-weight: bold; color: #00b4d8; margin-top: 4px;">0</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #10b981;">
+              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">Win Rate</div>
+              <div id="btWinRate" style="font-size: 22px; font-weight: bold; color: #10b981; margin-top: 4px;">0%</div>
+            </div>
+            <div style="padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #415a77;" id="btPnlBox">
+              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">PnL Total</div>
+              <div id="btTotalPnl" style="font-size: 22px; font-weight: bold; margin-top: 4px;">$0</div>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #ef4444;">
+              <div style="font-size: 10px; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.5px;">Max DD</div>
+              <div id="btMaxDD" style="font-size: 22px; font-weight: bold; color: #ef4444; margin-top: 4px;">0%</div>
+            </div>
+          </div>
+          
+          <!-- Segunda fila de KPIs -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
+            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Sharpe</div>
+              <div id="btSharpe" style="font-size: 16px; font-weight: bold; color: #e0e1dd; margin-top: 2px;">0.00</div>
+            </div>
+            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Profit Factor</div>
+              <div id="btProfitFactor" style="font-size: 16px; font-weight: bold; color: #e0e1dd; margin-top: 2px;">0.00</div>
+            </div>
+            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Mejor Trade</div>
+              <div id="btBestTrade" style="font-size: 16px; font-weight: bold; color: #10b981; margin-top: 2px;">$0</div>
+            </div>
+            <div style="background: rgba(65, 90, 119, 0.3); padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 10px; color: #778da9; text-transform: uppercase;">Peor Trade</div>
+              <div id="btWorstTrade" style="font-size: 16px; font-weight: bold; color: #ef4444; margin-top: 2px;">$0</div>
+            </div>
+          </div>
+          
+          <!-- Resumen Capital -->
+          <div style="background: rgba(27, 38, 59, 0.8); border-radius: 8px; padding: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: bold; color: #e0e1dd;">💵 Capital</span>
+            <div style="font-size: 13px; color: #778da9;">
+              <span id="btInitialCapital">$10,000</span> → <span id="btFinalEquity" style="font-weight: bold; color: #00b4d8;">$10,000</span>
+            </div>
+          </div>
+          
+          <!-- Acordeón de Trades -->
+          <div id="backtestTradesAccordion" style="border-radius: 8px; overflow: hidden;">
+            <div class="bt-accordion-header" onclick="toggleBacktestAccordion()" style="background: linear-gradient(135deg, #415a77 0%, #1b263b 100%); padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;">
+              <span style="color: white; font-weight: bold; font-size: 13px;">📋 Ver Detalle de Trades (<span id="btTradeCount">0</span>)</span>
+              <span id="btAccordionIcon" style="color: white; font-size: 16px; transition: transform 0.3s ease;">▼</span>
+            </div>
+            <div id="backtestTradesContent" style="display: none; background: rgba(13, 27, 42, 0.9); max-height: 400px; overflow-y: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                  <tr style="background: rgba(65, 90, 119, 0.5); position: sticky; top: 0;">
+                    <th style="padding: 10px 8px; text-align: left; color: #778da9; font-weight: 600;">#</th>
+                    <th style="padding: 10px 8px; text-align: left; color: #778da9; font-weight: 600;">Fecha</th>
+                    <th style="padding: 10px 8px; text-align: left; color: #778da9; font-weight: 600;">Tipo</th>
+                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">Entrada</th>
+                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">Salida</th>
+                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">PnL</th>
+                    <th style="padding: 10px 8px; text-align: center; color: #778da9; font-weight: 600;">Razón</th>
+                    <th style="padding: 10px 8px; text-align: right; color: #778da9; font-weight: 600;">Duración</th>
+                  </tr>
+                </thead>
+                <tbody id="btTradesTableBody">
+                  <!-- Se llena dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Error si existe -->
+          <div id="backtestError" style="display: none; background: rgba(244, 67, 54, 0.1); border: 1px solid #f44336; border-radius: 8px; padding: 12px; margin-top: 12px;">
+            <p style="margin: 0; color: #f44336; font-size: 12px;">
+              <strong>⚠️ Error:</strong> <span id="backtestErrorText"></span>
+            </p>
+          </div>
+        </div>
+        
+        <!-- Estado vacío inicial -->
+        <div id="backtestEmpty" style="text-align: center; padding: 20px; color: #a0a0a0;">
+          <p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #00b4d8;">"Ejecutar Backtest"</strong> para simular el rendimiento histórico de las señales.</p>
+        </div>
+      </div>
+      <!-- ========== FIN CONTENEDOR DE BACKTEST ========== -->
+      
     </div>
     <div class="card">
       <h3>📊 Estado del Trading</h3>
@@ -1595,9 +1721,212 @@
       document.getElementById('analysisEmpty').innerHTML = '<p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #e94560;">"Generar Análisis"</strong> para obtener una explicación detallada de las señales.</p>';
       document.getElementById('analysisAccordionContent').style.display = 'none';
       document.getElementById('accordionIcon').style.transform = 'rotate(0deg)';
+      
+      // Resetear el contenedor de backtest
+      document.getElementById('backtestContent').style.display = 'none';
+      document.getElementById('backtestEmpty').style.display = 'block';
+      document.getElementById('backtestEmpty').innerHTML = '<p style="margin: 0; font-size: 13px;">Presiona <strong style="color: #00b4d8;">"Ejecutar Backtest"</strong> para simular el rendimiento histórico de las señales.</p>';
+      document.getElementById('backtestTradesContent').style.display = 'none';
+      document.getElementById('btAccordionIcon').style.transform = 'rotate(0deg)';
     });
     
     console.log('✅ Sistema de análisis LLM cargado');
+    
+    // ==========================================
+    // BACKTEST: Funciones para ejecutar y visualizar backtest
+    // ==========================================
+    
+    async function runBacktest() {
+      const btn = document.getElementById('runBacktestBtn');
+      const btnIcon = document.getElementById('backtestButtonIcon');
+      const btnText = document.getElementById('backtestButtonText');
+      const loadingIndicator = document.getElementById('backtestLoadingIndicator');
+      const backtestContent = document.getElementById('backtestContent');
+      const backtestEmpty = document.getElementById('backtestEmpty');
+      const backtestError = document.getElementById('backtestError');
+      
+      const params = getSelectedParams();
+      
+      // Deshabilitar botón y mostrar loading
+      btn.disabled = true;
+      btnIcon.textContent = '⏳';
+      btnText.textContent = 'Ejecutando...';
+      loadingIndicator.style.display = 'block';
+      backtestContent.style.display = 'none';
+      backtestEmpty.style.display = 'none';
+      backtestError.style.display = 'none';
+      
+      console.log('📊 Ejecutando backtest para', params.ticker);
+      
+      try {
+        const response = await fetch(
+          `${API_BASE}/backtest/${encodeURIComponent(params.ticker)}?years=${params.years}&interval=${params.interval}`
+        );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Backtest completado:', result);
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+        
+        // Actualizar KPIs
+        updateBacktestKPIs(result.summary);
+        
+        // Renderizar tabla de trades
+        renderTradesTable(result.trades);
+        
+        // Actualizar contador de trades
+        document.getElementById('btTradeCount').textContent = result.trades.length;
+        
+        // Mostrar contenido
+        loadingIndicator.style.display = 'none';
+        backtestContent.style.display = 'block';
+        
+      } catch (error) {
+        console.error('❌ Error en backtest:', error);
+        loadingIndicator.style.display = 'none';
+        document.getElementById('backtestErrorText').textContent = error.message;
+        backtestError.style.display = 'block';
+        backtestEmpty.style.display = 'block';
+        backtestEmpty.innerHTML = `
+          <p style="margin: 0; font-size: 13px; color: #f44336;">
+            <strong>❌ Error:</strong> ${error.message}
+          </p>
+        `;
+      } finally {
+        btn.disabled = false;
+        btnIcon.textContent = '📊';
+        btnText.textContent = 'Ejecutar Backtest';
+      }
+    }
+    
+    function updateBacktestKPIs(summary) {
+      // Total Trades
+      document.getElementById('btTotalTrades').textContent = summary.total_trades;
+      
+      // Win Rate
+      document.getElementById('btWinRate').textContent = `${summary.win_rate.toFixed(1)}%`;
+      
+      // PnL Total con color
+      const pnlBox = document.getElementById('btPnlBox');
+      const pnlEl = document.getElementById('btTotalPnl');
+      const pnl = summary.total_pnl;
+      if (pnl >= 0) {
+        pnlBox.style.background = 'rgba(16, 185, 129, 0.15)';
+        pnlBox.style.borderColor = '#10b981';
+        pnlEl.style.color = '#10b981';
+        pnlEl.textContent = `+$${pnl.toFixed(2)}`;
+      } else {
+        pnlBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        pnlBox.style.borderColor = '#ef4444';
+        pnlEl.style.color = '#ef4444';
+        pnlEl.textContent = `-$${Math.abs(pnl).toFixed(2)}`;
+      }
+      
+      // Max Drawdown
+      document.getElementById('btMaxDD').textContent = `${summary.max_drawdown_pct.toFixed(1)}%`;
+      
+      // Segunda fila
+      document.getElementById('btSharpe').textContent = summary.sharpe_ratio.toFixed(2);
+      document.getElementById('btProfitFactor').textContent = summary.profit_factor >= 999 ? '∞' : summary.profit_factor.toFixed(2);
+      document.getElementById('btBestTrade').textContent = `+$${summary.best_trade.toFixed(2)}`;
+      document.getElementById('btWorstTrade').textContent = `$${summary.worst_trade.toFixed(2)}`;
+      
+      // Capital
+      document.getElementById('btInitialCapital').textContent = `$${summary.initial_capital.toLocaleString()}`;
+      document.getElementById('btFinalEquity').textContent = `$${summary.final_equity.toLocaleString()}`;
+    }
+    
+    function renderTradesTable(trades) {
+      const tbody = document.getElementById('btTradesTableBody');
+      tbody.innerHTML = '';
+      
+      trades.forEach((trade, index) => {
+        const isLong = trade.side === 'LONG';
+        const isProfitable = trade.pnl > 0;
+        const isOpen = trade.status === 'OPEN';
+        
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid rgba(65, 90, 119, 0.3)';
+        
+        // Formatear duración
+        let durationStr = '—';
+        if (trade.duration_minutes !== null) {
+          if (trade.duration_minutes < 60) {
+            durationStr = `${trade.duration_minutes.toFixed(0)}m`;
+          } else if (trade.duration_minutes < 1440) {
+            durationStr = `${(trade.duration_minutes / 60).toFixed(1)}h`;
+          } else {
+            durationStr = `${(trade.duration_minutes / 1440).toFixed(1)}d`;
+          }
+        }
+        
+        // Formatear fecha de entrada
+        let entryTimeStr = '—';
+        try {
+          const entryDate = new Date(trade.entry_time);
+          entryTimeStr = entryDate.toLocaleDateString('es', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        } catch {}
+        
+        // Formatear fecha de entrada
+        let entryDateStr = '—';
+        try {
+          const entryDate = new Date(trade.entry_time);
+          entryDateStr = entryDate.toLocaleDateString('es', { day: '2-digit', month: 'short', year: '2-digit' }) + 
+                         ' ' + entryDate.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+        } catch {}
+        
+        row.innerHTML = `
+          <td style="padding: 10px 8px; color: #e0e1dd;">${trade.id}</td>
+          <td style="padding: 10px 8px; color: #778da9; font-size: 11px; white-space: nowrap;">${entryDateStr}</td>
+          <td style="padding: 10px 8px;">
+            <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;
+              background: ${isLong ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+              color: ${isLong ? '#10b981' : '#ef4444'};">
+              ${trade.side}
+            </span>
+          </td>
+          <td style="padding: 10px 8px; text-align: right; color: #e0e1dd; font-family: monospace;">$${trade.entry_price.toFixed(2)}</td>
+          <td style="padding: 10px 8px; text-align: right; color: #e0e1dd; font-family: monospace;">
+            ${isOpen ? '<span style="color: #fbbf24;">ABIERTO</span>' : '$' + trade.exit_price.toFixed(2)}
+          </td>
+          <td style="padding: 10px 8px; text-align: right; font-weight: bold; font-family: monospace;
+            color: ${isProfitable ? '#10b981' : '#ef4444'};">
+            ${isOpen ? '—' : (isProfitable ? '+' : '') + '$' + trade.pnl.toFixed(2)}
+          </td>
+          <td style="padding: 10px 8px; text-align: center;">
+            ${isOpen ? '—' : `<span style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;
+              background: ${trade.exit_reason === 'TP' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+              color: ${trade.exit_reason === 'TP' ? '#10b981' : '#ef4444'};">
+              ${trade.exit_reason}
+            </span>`}
+          </td>
+          <td style="padding: 10px 8px; text-align: right; color: #778da9; font-size: 11px;">${durationStr}</td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    function toggleBacktestAccordion() {
+      const content = document.getElementById('backtestTradesContent');
+      const icon = document.getElementById('btAccordionIcon');
+      
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+    
+    console.log('✅ Sistema de Backtest cargado');
   </script>
 </body>
 
