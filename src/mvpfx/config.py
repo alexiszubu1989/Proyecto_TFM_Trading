@@ -37,7 +37,7 @@ def get_cfg() -> dict:
             "risk": {"capital": 10000.0, "risk_per_trade": 0.0075, "atr_sl_mult": 1.5, "atr_tp_mult": 2.0, "trailing_mult": 0.0,
                      "daily_loss_limit": 0.03, "max_trades_per_day": 6, "max_position_units": 100000, "min_position_units": 1000},
             "execution": {"simulate_spread": 0.00005, "simulate_slippage": 0.00002},
-            "data": {"source": "simulated", "csv_path": "./data/eurusd.csv", "bars": 3000, "seed": 42},
+            "data": {"source": "yfinance", "bars": 3000},
             "api": {"host": "127.0.0.1", "port": 8000, "cors_origins": ["*"]},
             "flags": {"enable_live": False, "paper_only": True}
         }
