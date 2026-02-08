@@ -450,8 +450,3 @@ def post_backtest(
     )
 
 
-if __name__ == "__main__":
-    import uvicorn
-    cfg = get_cfg()
-    uvicorn.run("mvpfx.api:app", host=cfg["api"]["host"], port=cfg["api"]["port"], reload=True)
-
