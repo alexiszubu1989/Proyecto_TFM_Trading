@@ -305,26 +305,6 @@
       margin: var(--spacing-xs) 0;
     }
 
-    .signal-explanation {
-      background: #f0f7ff;
-      padding: var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      margin-top: var(--spacing-sm);
-      font-size: var(--font-sm);
-      line-height: 1.5;
-      display: none;
-    }
-
-    .signal-item.expanded .signal-explanation {
-      display: block;
-    }
-
-    .expand-icon {
-      font-size: var(--font-sm);
-      color: var(--color-primary);
-      cursor: pointer;
-    }
-
     /* Stats */
     .stats-grid {
       display: grid;
@@ -1072,9 +1052,10 @@
         <button id="loadDataBtn" class="btn btn--primary btn--full">Cargar Datos</button>
       </div>
     </div>
-    <p class="text-muted text-sm" style="margin: 10px 0 0 0;">
-      Intervalos de 1m y 5m limitados a datos recientes (máx 7-60 días).
+    <p id="dataLimitWarning" class="text-muted text-sm" style="margin: 10px 0 0 0;">
+      <strong>Límites de Yahoo Finance:</strong> 1m (7 días), 5m/15m (60 días), 1h (2 años), 1d/1mo (sin límite).
     </p>
+    <p id="currentLimitInfo" class="text-sm" style="margin: 5px 0 0 0; color: #e65100; display: none;"></p>
   </div>
 
   <div class="grid">
@@ -1367,7 +1348,7 @@
     const TradingApp = {
       config: {
         API_BASE: 'http://127.0.0.1:8000',
-        MAX_CHART_BARS: 500,
+        MAX_CHART_BARS: 5000,
         AUTO_REFRESH_INTERVAL: 60000
       },
 
@@ -1580,7 +1561,7 @@
           }
         },
 
-        renderSignalsList(signals, params, explanations) {
+        renderSignalsList(signals, params) {
           const container = document.getElementById('signalsContainer');
           container.innerHTML = '';
 
@@ -1643,23 +1624,13 @@
                 <strong>TP:</strong> $${signal.tp ? signal.tp.toFixed(2) : 'N/A'}
               </div>
               ${hasVotingData ? '<div class="text-muted text-sm" style="text-align: center; margin-top: 6px;">Clic para ver detalle de votación</div>' : ''}
-              <div class="signal-explanation">
-                <strong>Explicación IA:</strong><br>
-                ${explanations.text || 'Análisis técnico basado en cruces de EMAs y confirmación de indicadores.'}
-              </div>
-              <div style="text-align: right; margin-top: 4px;">
-                <span class="expand-icon">▼ Ver más</span>
-              </div>
             `;
 
-            item.addEventListener('click', function(e) {
-              if (hasVotingData) {
+            if (hasVotingData) {
+              item.addEventListener('click', function(e) {
                 TradingApp.ui.showVotingDetail(this);
-              }
-              this.classList.toggle('expanded');
-              const icon = this.querySelector('.expand-icon');
-              icon.textContent = this.classList.contains('expanded') ? '▲ Ver menos' : '▼ Ver más';
-            });
+              });
+            }
 
             container.appendChild(item);
           });
@@ -1769,6 +1740,54 @@
 
       // Chart methods
       chart: {
+        // Calcula el número máximo de barras según el rango e intervalo
+        getMaxBarsForRange(years, interval) {
+          // Barras estimadas por intervalo y año
+          const barsPerYear = {
+            '1m': 252 * 6.5 * 60,   // ~98,280 barras/año (días trading × horas × minutos)
+            '5m': 252 * 6.5 * 12,   // ~19,656 barras/año
+            '15m': 252 * 6.5 * 4,   // ~6,552 barras/año
+            '1h': 252 * 8,           // ~2,016 barras/año (Forex es ~24h)
+            '1d': 252,               // ~252 barras/año
+            '1mo': 12                // 12 barras/año
+          };
+          
+          const estimatedBars = (barsPerYear[interval] || 2000) * years;
+          // Limitar a 10000 máximo por rendimiento, pero mostrar todos si son menos
+          return Math.min(Math.ceil(estimatedBars * 1.2), 10000);
+        },
+
+        // Muestrea datos si hay demasiados puntos para mantener rendimiento
+        sampleData(signals, maxBars) {
+          if (signals.length <= maxBars) return signals;
+          
+          // Muestreo uniforme manteniendo primera/última barra y todas las señales activas
+          const step = signals.length / maxBars;
+          const sampled = [];
+          const signalIndices = new Set();
+          
+          // Siempre incluir barras con señales activas
+          signals.forEach((s, i) => {
+            if (s.signal !== 0) signalIndices.add(i);
+          });
+          
+          // Muestreo uniforme
+          for (let i = 0; i < signals.length; i += step) {
+            const idx = Math.floor(i);
+            if (!signalIndices.has(idx)) {
+              sampled.push({ ...signals[idx], _idx: idx });
+            }
+          }
+          
+          // Agregar todas las barras con señales
+          signalIndices.forEach(idx => {
+            sampled.push({ ...signals[idx], _idx: idx });
+          });
+          
+          // Ordenar por índice original y retornar
+          return sampled.sort((a, b) => a._idx - b._idx);
+        },
+
         create(signals, params) {
           const ctx = document.getElementById('priceChart').getContext('2d');
           
@@ -1777,8 +1796,8 @@
             TradingApp.state.chart = null;
           }
 
-          const maxBars = TradingApp.config.MAX_CHART_BARS;
-          const chartData = signals.length > maxBars ? signals.slice(-maxBars) : signals;
+          const maxBars = this.getMaxBarsForRange(params.years, params.interval);
+          const chartData = this.sampleData(signals, maxBars);
 
           const candlestickData = chartData.map((s, i) => ({
             x: i,
@@ -2205,13 +2224,38 @@
           return;
         }
 
-        const explanations = await this.api.getExplanations();
         const activeSignals = signals.filter(s => s.signal !== 0);
 
         this.ui.updateStats(signals, params);
         this.ui.updateActiveSignal(signals, params);
-        this.ui.renderSignalsList(signals, params, explanations);
+        this.ui.renderSignalsList(signals, params);
         this.chart.create(signals, params);
+      },
+
+      // Límites de datos de Yahoo Finance por intervalo (en años)
+      dataLimits: {
+        '1m': { maxYears: 0.02, maxDays: 7, label: '7 días' },
+        '5m': { maxYears: 0.17, maxDays: 60, label: '60 días' },
+        '15m': { maxYears: 0.17, maxDays: 60, label: '60 días' },
+        '1h': { maxYears: 2, maxDays: 730, label: '2 años' },
+        '1d': { maxYears: 10, maxDays: 3650, label: '10 años' },
+        '1mo': { maxYears: 20, maxDays: 7300, label: '20 años' }
+      },
+
+      // Muestra advertencia de límite de datos
+      showDataLimitWarning() {
+        const interval = document.getElementById('intervalSelect').value;
+        const years = parseFloat(document.getElementById('rangeSelect').value);
+        const limit = this.dataLimits[interval];
+        const infoEl = document.getElementById('currentLimitInfo');
+        
+        if (years > limit.maxYears) {
+          const rangeLabel = document.getElementById('rangeSelect').selectedOptions[0].text;
+          infoEl.innerHTML = `⚠️ <strong>Atención:</strong> Para intervalo ${interval}, Yahoo Finance limita a <strong>${limit.label}</strong> de datos. Seleccionaste "${rangeLabel}" pero solo se mostrarán los últimos ${limit.label}.`;
+          infoEl.style.display = 'block';
+        } else {
+          infoEl.style.display = 'none';
+        }
       },
 
       // Setup event listeners
@@ -2223,17 +2267,18 @@
 
         document.getElementById('resetZoom').addEventListener('click', () => this.chart.reset());
 
-        document.getElementById('intervalSelect').addEventListener('change', function() {
-          const interval = this.value;
-          const rangeSelect = document.getElementById('rangeSelect');
-
-          // Adjust range limits based on interval
-          if (interval === '1m' && parseFloat(rangeSelect.value) > 0.02) {
-            rangeSelect.value = '0.02';
-          } else if (['5m', '15m'].includes(interval) && parseFloat(rangeSelect.value) > 0.17) {
-            rangeSelect.value = '0.08';
-          }
+        // Validar límites al cambiar intervalo
+        document.getElementById('intervalSelect').addEventListener('change', () => {
+          this.showDataLimitWarning();
         });
+
+        // Validar límites al cambiar rango
+        document.getElementById('rangeSelect').addEventListener('change', () => {
+          this.showDataLimitWarning();
+        });
+
+        // Mostrar advertencia inicial si aplica
+        this.showDataLimitWarning();
 
         // Initialize
         this.init();
