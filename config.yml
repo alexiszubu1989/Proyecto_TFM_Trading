@@ -6,8 +6,8 @@ warmup_bars: 50            # Reducido para que queden datos después del warmup
 
 # --- Ventanas indicadores ---
 indicators:
-  ema_fast: 3              # ⚡⚡ ULTRA-RÁPIDA: Máxima generación de señales
-  ema_slow: 8              # ⚡⚡ ULTRA-RÁPIDA: Máxima generación de señales
+  ema_fast: 3              
+  ema_slow: 8              
   rsi_period: 14
   macd_signal: 9
   atr_period: 14
@@ -26,7 +26,7 @@ indicators:
 strategy:
   # Selector de estrategia
   active_strategy: "ema_crossover"  # ema_crossover | rsi_reversal | macd_crossover | bollinger_breakout
-  combine_strategies: true           # ✅ ACTIVADO: Evaluar TODAS las estrategias por votación
+  combine_strategies: true           # ACTIVADO: Evaluar TODAS las estrategias por votación
   enabled_strategies:                # Estrategias a evaluar
     - "ema_crossover"
     - "rsi_reversal"
@@ -39,11 +39,11 @@ strategy:
   tie_break_method: "score"          # Por defecto: mayor score promedio gana
   
   # Filtros originales (para ema_crossover)
-  rsi_long_min: 0          # 🔓 SIN FILTRO RSI: Permite todas las compras
-  rsi_short_max: 100       # 🔓 SIN FILTRO RSI: Permite todas las ventas
+  rsi_long_min: 0          #  SIN FILTRO RSI: Permite todas las compras
+  rsi_short_max: 100       #  SIN FILTRO RSI: Permite todas las ventas
   macd_confirm: false      # Desactivar para más señales
-  min_atr_pct: 0.0         # 🔓 SIN FILTRO: Acepta cualquier volatilidad
-  regime_threshold: 0.0    # 🔓 SIN FILTRO: Acepta cualquier régimen
+  min_atr_pct: 0.0         #  SIN FILTRO: Acepta cualquier volatilidad
+  regime_threshold: 0.0    #  SIN FILTRO: Acepta cualquier régimen
 
 # --- Configuración de Estrategias Individuales ---
 strategies:
